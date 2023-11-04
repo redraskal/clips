@@ -1,0 +1,7 @@
+{
+	"recommendations": [
+		"esbenp.prettier-vscode",
+		"tobermory.es6-string-html",
+		"formulahendry.auto-close-tag"
+	]
+}
