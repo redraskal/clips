@@ -1,0 +1,22 @@
+name: test
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: setup
+        name: Setup
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Run tests
+        id: test
+        run: bun test

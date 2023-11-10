@@ -1,13 +1,12 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
 # ignore
-migrations/
-public/
+drizzle
+public/img
+public/fonts
 bun.lockb
 Dockerfile
-.vscode/
-
-# lavalier
+.vscode
 *.sqlite
 
 # Logs

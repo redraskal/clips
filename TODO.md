@@ -1,0 +1,7 @@
+- Upload backend
+- WebSocket & JSON API for upload progress
+- Transcoding to best quality vp9
+- Generating thumbnail
+- Generate wave graph (show audio volume of clip)
+- Upload frontend
+- Account backend with redis for session tokens

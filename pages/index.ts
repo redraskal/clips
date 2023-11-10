@@ -11,17 +11,27 @@ export default class implements Route {
 	}
 
 	head(data: Data<this>) {
-		return html` <title>Hello ${data.name}!</title> `;
+		return html`
+			<title>Hello ${data.name}!</title>
+			<link rel="stylesheet" href="/css/style.css" />
+		`;
 	}
 
 	body(data: Data<this>) {
 		return html`
-			<h1>Hello ${data.name} at ${data.time}!</h1>
-			<form method="post">
-				<label for="name">Name</label>
-				<input type="text" id="name" name="name" autofocus required />
-				<input type="submit" value="Submit" />
-			</form>
+			<nav>
+				<h2>Clips</h2>
+				<ul>
+					<li>
+						<a href="">Home</a>
+					</li>
+				</ul>
+			</nav>
+			<main>
+				<input type="text" placeholder="Search" />
+				<h2>Recently uploaded</h2>
+				<h2>From friends</h2>
+			</main>
 		`;
 	}
 }
