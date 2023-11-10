@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `accounts_discord_id_unique` ON `accounts` (`discord_id`);

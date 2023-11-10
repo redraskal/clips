@@ -6,6 +6,6 @@ export const accounts = sqliteTable("accounts", {
 		.primaryKey()
 		.$defaultFn(() => snowflake().toString()),
 	username: text("username").notNull(),
-	discord_id: text("discord_id").notNull(),
+	discord_id: text("discord_id").notNull().unique(),
 	discord_avatar_hash: text("discord_avatar_hash"),
 });

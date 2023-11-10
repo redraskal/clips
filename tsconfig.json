@@ -5,6 +5,7 @@
 		"target": "esnext",
 		"moduleResolution": "node",
 		"moduleDetection": "force",
+		"experimentalDecorators": true,
 		"strict": true,
 		"downlevelIteration": true,
 		"skipLibCheck": true,
