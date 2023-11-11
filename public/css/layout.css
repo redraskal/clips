@@ -1,0 +1,13 @@
+ul.clips {
+	display: flex;
+	list-style-type: none;
+}
+
+ul.clips > li {
+	max-width: 500px;
+}
+
+ul.clips > li > video {
+	background: black;
+	cursor: pointer;
+}

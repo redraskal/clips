@@ -1,6 +1,6 @@
-import { Route, html } from "gateway";
+import { Route } from "gateway";
 import { ensureSignedIn, sessionToken } from "../src/middleware/auth";
-import { sessions } from "../src/schema/sessions";
+import { Sessions } from "../src/schema/sessions";
 import { database } from "../src/database";
 import { eq } from "drizzle-orm";
 
@@ -9,12 +9,8 @@ export default class implements Route {
 	async data(req: Request) {
 		const token = sessionToken(req);
 		if (!token) return {};
-		database.delete(sessions).where(eq(sessions.id, token));
+		database.delete(Sessions).where(eq(Sessions.id, token));
 		return {};
-	}
-
-	head() {
-		return html` <title>Hello world!</title> `;
 	}
 
 	body() {

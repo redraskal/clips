@@ -1,5 +1,5 @@
 :root {
-	--background: black;
+	--background: color(display-p3 0.3 0.3 0.688 / 1);
 	--accents-1: #111;
 	--accents-2: #333;
 	--accents-3: #444;

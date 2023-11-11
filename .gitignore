@@ -10,6 +10,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 *.sqlite
+storage
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 

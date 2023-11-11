@@ -1,9 +1,9 @@
 import { MatchedRoute } from "bun";
 import { RouteError } from "gateway";
 import { database } from "../database";
-import { sessions } from "../schema/sessions";
+import { Sessions } from "../schema/sessions";
 import { eq } from "drizzle-orm";
-import { accounts } from "../schema/accounts";
+import { Accounts } from "../schema/accounts";
 
 export function parseCookie(req: Request) {
 	return req.headers
@@ -25,13 +25,13 @@ export function sessionToken(req: Request) {
 	return jsonToken ? jsonToken : cookie;
 }
 
-export function inferAccount(req: Request): typeof accounts.$inferSelect | undefined {
+export function inferAccount(req: Request): typeof Accounts.$inferSelect | undefined {
 	// @ts-ignore
 	if (req._account) return req._account;
 	const token = sessionToken(req);
-	const session = token ? database.select().from(sessions).where(eq(sessions.id, token)).get() : null;
+	const session = token ? database.select().from(Sessions).where(eq(Sessions.id, token)).get() : null;
 	if (!session) return undefined;
-	const account = database.select().from(accounts).where(eq(accounts.id, session.account_id)).get();
+	const account = database.select().from(Accounts).where(eq(Accounts.id, session.account_id)).get();
 	// @ts-ignore
 	req._account = account;
 	return account;

@@ -1,7 +1,7 @@
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { snowflake } from "../snowflake";
 
-export const accounts = sqliteTable("accounts", {
+export const Accounts = sqliteTable("accounts", {
 	id: text("id")
 		.primaryKey()
 		.$defaultFn(() => snowflake().toString()),

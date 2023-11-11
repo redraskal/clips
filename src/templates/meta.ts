@@ -7,7 +7,7 @@ type MetaParams = {
 };
 
 export function meta(params: MetaParams) {
-	const title = `${params.title} • Clips`;
+	const title = `${params.title} | Clips`;
 	const description = params.description || "";
 	const image = params.image || "";
 
