@@ -9,6 +9,7 @@ Dockerfile
 .vscode
 *.sqlite
 storage
+patch.ts
 
 # Logs
 

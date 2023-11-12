@@ -6,6 +6,7 @@ import { Accounts } from "../src/schema/accounts";
 import { database } from "../src/database";
 import { Sessions } from "../src/schema/sessions";
 import { site } from "../src/templates/site";
+import { whitelist } from "../src/whitelist";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
 
@@ -30,7 +31,10 @@ export default class implements Route {
 			}),
 		}).then((res) => res.json());
 
-		if (!token.access_token) throw new Error("Could not authenticate Discord account.");
+		if (!token.access_token) {
+			console.debug(token);
+			throw new Error("Could not authenticate Discord account.");
+		}
 
 		const me = await fetch("https://discord.com/api/oauth2/@me", {
 			headers: {
@@ -38,7 +42,11 @@ export default class implements Route {
 			},
 		}).then((res) => res.json());
 
-		if (!me.user) throw new Error("Could not authenticate Discord account.");
+		if (!me.user) {
+			console.debug(me);
+			throw new Error("Could not authenticate Discord account.");
+		}
+		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
 
 		// https://github.com/drizzle-team/drizzle-orm/issues/777
 		const user = database
@@ -87,13 +95,12 @@ export default class implements Route {
 			});
 		}
 
-		return site(
-			"/login",
-			html`
+		return site({
+			path: "/login",
+			body: html`
 				<h1>Clips</h1>
-				<p>Sign in</p>
 				<button onclick="window.location.href = '${process.env.DISCORD_OAUTH_URL}'">Sign in with Discord</button>
-			`
-		);
+			`,
+		});
 	}
 }

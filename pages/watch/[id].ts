@@ -16,6 +16,7 @@ export default class implements Route {
 			})
 			.where(eq(Clips.id, route.params.id))
 			.run();
+
 		const data = database
 			.select()
 			.from(Clips)
@@ -41,15 +42,15 @@ export default class implements Route {
 	}
 
 	body(data: Data<this>) {
-		return site(
-			`/watch/${data.clip.id}`,
-			html`
+		return site({
+			path: `/watch/${data.clip.id}`,
+			body: html`
 				<video src="${data.root}.mp4" poster="${data.root}.jpg" autoplay muted controls loop></video>
 				<h1>${data.clip.title}</h1>
 				<p>${data.uploader.username}</p>
 				<p>${data.clip.views} view${data.clip.views != 1 ? "s" : ""}</p>
 				<p>${data.clip.description || ""}</p>
-			`
-		);
+			`,
+		});
 	}
 }

@@ -1,4 +1,3 @@
-import { MatchedRoute } from "bun";
 import { Data, Route, html } from "gateway";
 import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
 import { meta } from "../src/templates/meta";
@@ -13,40 +12,34 @@ import { site } from "../src/templates/site";
 
 export default class implements Route {
 	@ensureSignedIn()
-	async data(req: Request, route: MatchedRoute) {
+	async data(req: Request) {
 		if (req.method != "POST") return;
 
 		const user = inferAccount(req)!;
 		const formData = await req.formData();
-		const files = (formData.getAll("files") as File[]).filter((file) => file.type == "video/mp4");
+		const file = formData.get("file") as File;
 
-		if (!files) throw new Error("No files specified.");
-		if (files.length == 0) throw new Error("Only mp4 files are supported.");
+		if (!file) throw new Error("No files specified.");
+		if (file.type != "video/mp4") throw new Error("Only mp4 files are supported.");
 
 		const root = join(process.env.STORAGE_PATH!, user.id);
 		await mkdir(root, { recursive: true });
 
-		const clips = database
+		const clip = database
 			.insert(Clips)
-			.values(
-				files.map((file) => {
-					return {
-						title: parse(file.name).name,
-						uploader_id: user.id,
-						video_duration: -1,
-					};
-				})
-			)
+			.values({
+				title: parse(file.name).name,
+				uploader_id: user.id,
+				video_duration: -1,
+			})
 			.returning()
-			.all();
+			.get();
 
-		for (let i = 0; i < files.length; i++) {
-			const path = join(root, `${clips[i].id}.mp4`);
-			await Bun.write(path, files[i] as unknown as Blob);
-			const duration = await videoDuration(path);
-			await generateThumbnail(path, duration / 2, join(root, `${clips[i].id}.jpg`));
-			database.update(Clips).set({ video_duration: duration }).where(eq(Clips.id, clips[i].id)).run();
-		}
+		const path = join(root, `${clip.id}.mp4`);
+		await Bun.write(path, file as unknown as Blob);
+		const duration = await videoDuration(path);
+		await generateThumbnail(path, duration / 2, join(root, `${clip.id}.jpg`));
+		database.update(Clips).set({ video_duration: duration }).where(eq(Clips.id, clip.id)).run();
 
 		return {};
 	}
@@ -58,9 +51,9 @@ export default class implements Route {
 	}
 
 	body(data: Data<this>, err?: Error) {
-		return site(
-			"/upload",
-			html`
+		return site({
+			path: "/upload",
+			body: html`
 				<style>
 					#drag {
 						display: flex;
@@ -75,37 +68,37 @@ export default class implements Route {
 				<h1>Upload clips</h1>
 				<input type="file" id="file" multiple accept="video/mp4" hidden />
 				<div id="drag">Drag clips here or click to upload</div>
-				<button>Done</button>
 				<script>
 					const drag = document.getElementById("drag");
 					const file = document.getElementById("file");
 
 					drag.addEventListener("dragover", (e) => e.preventDefault());
 					drag.addEventListener("click", () => file.click());
-					file.addEventListener("change", (e) => {
-						upload(e.target.files);
+					file.addEventListener("change", async (e) => {
+						await upload(e.target.files);
 					});
-					drag.addEventListener("drop", (e) => {
+					drag.addEventListener("drop", async (e) => {
 						e.preventDefault();
-						upload(e.dataTransfer.files);
+						await upload(e.dataTransfer.files);
 					});
 
-					function upload(files) {
-						const data = new FormData();
+					async function upload(files) {
 						for (const file of files) {
-							data.append("files", file, file.name);
+							const data = new FormData();
+							data.append("file", file, file.name);
+							await fetch("/upload", {
+								method: "POST",
+								headers: {
+									Accept: "application/json",
+								},
+								body: data,
+							});
+							console.log("uploaded", file.name);
+							window.location.href = "/";
 						}
-						fetch("/upload", {
-							method: "POST",
-							headers: {
-								Accept: "application/json",
-								"Content-Type": "multipart/form-data",
-							},
-							body: data,
-						}).then(() => alert("Uploaded!"));
 					}
 				</script>
-			`
-		);
+			`,
+		});
 	}
 }
