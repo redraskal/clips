@@ -70,11 +70,13 @@ export default class implements Route {
 					}
 				</style>
 				<h1>Upload clips</h1>
+				<p id="progress"></p>
 				<input type="file" id="file" multiple accept="video/mp4" hidden />
 				<div id="drag">Drag clips here or click to upload</div>
 				<script>
 					const drag = document.getElementById("drag");
 					const file = document.getElementById("file");
+					const progress = document.getElementById("progress");
 
 					drag.addEventListener("dragover", (e) => e.preventDefault());
 					drag.addEventListener("click", () => file.click());
@@ -86,10 +88,17 @@ export default class implements Route {
 						await upload(e.dataTransfer.files);
 					});
 
+					function pushProgress(text) {
+						progress.innerText += text;
+						progress.innerHTML += "<br />";
+					}
+
 					async function upload(files) {
-						for (const file of files) {
+						for (let i = 0; i < files.length; i++) {
+							const file = files[i];
 							const data = new FormData();
 							data.append("file", file, file.name);
+							pushProgress("[" + (i + 1) + "/" + files.length + "] Uploading " + file.name + "...");
 							await fetch("/upload", {
 								method: "POST",
 								headers: {
@@ -97,9 +106,8 @@ export default class implements Route {
 								},
 								body: data,
 							});
-							console.log("uploaded", file.name);
-							window.location.href = "/";
 						}
+						window.location.href = "/";
 					}
 				</script>
 			`,

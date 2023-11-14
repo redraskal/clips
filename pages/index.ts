@@ -25,7 +25,7 @@ export default class implements Route {
 					.from(Clips)
 					.where(eq(Clips.uploader_id, account.id))
 					.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
-					.limit(8)
+					.limit(100)
 					.all()
 			: [];
 
@@ -42,7 +42,7 @@ export default class implements Route {
 					.from(Clips)
 					.where(ne(Clips.uploader_id, account.id))
 					.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
-					.limit(16)
+					.limit(100)
 					.all()
 			: [];
 

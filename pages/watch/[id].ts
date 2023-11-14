@@ -61,6 +61,7 @@ export default class implements Route {
 			title: data.clip!.title,
 			description: data.clip!.description || undefined,
 			image: `${data.root}.jpg`,
+			video: `${process.env.WEBSITE_ROOT || ""}/content/${data.clip!.uploader_id}/${data.clip!.id}.mp4`,
 		});
 	}
 
