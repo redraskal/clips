@@ -13,23 +13,24 @@ import { site } from "../src/templates/site";
 export default class implements Route {
 	@ensureSignedIn()
 	async data(req: Request) {
-		if (req.method != "POST") return;
+		if (req.method == "GET") return { account: inferAccount(req) };
+		if (req.method != "POST") return {};
 
-		const user = inferAccount(req)!;
+		const account = inferAccount(req)!;
 		const formData = await req.formData();
 		const file = formData.get("file") as File;
 
 		if (!file) throw new Error("No files specified.");
 		if (file.type != "video/mp4") throw new Error("Only mp4 files are supported.");
 
-		const root = join(process.env.STORAGE_PATH!, user.id);
+		const root = join(process.env.STORAGE_PATH!, account.id);
 		await mkdir(root, { recursive: true });
 
 		const clip = database
 			.insert(Clips)
 			.values({
 				title: parse(file.name).name,
-				uploader_id: user.id,
+				uploader_id: account.id,
 				video_duration: -1,
 			})
 			.returning()
@@ -41,7 +42,9 @@ export default class implements Route {
 		await generateThumbnail(path, duration / 2, join(root, `${clip.id}.jpg`));
 		database.update(Clips).set({ video_duration: duration }).where(eq(Clips.id, clip.id)).run();
 
-		return {};
+		return {
+			account,
+		};
 	}
 
 	head() {
@@ -53,6 +56,7 @@ export default class implements Route {
 	body(data: Data<this>, err?: Error) {
 		return site({
 			path: "/upload",
+			account: data.account,
 			body: html`
 				<style>
 					#drag {

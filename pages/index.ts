@@ -5,17 +5,45 @@ import { database } from "../src/database";
 import { Clips } from "../src/schema/clips";
 import { site } from "../src/templates/site";
 import { eq, ne } from "drizzle-orm";
+import { clipPreviews } from "../src/templates/clipPreviews";
+import { Accounts } from "../src/schema/accounts";
 
 export default class implements Route {
 	async data(req: Request) {
 		const account = inferAccount(req);
 
 		const recentlyUploaded = account
-			? database.select().from(Clips).where(eq(Clips.uploader_id, account.id)).limit(8).all()
+			? database
+					.select({
+						id: Clips.id,
+						uploader_id: Clips.uploader_id,
+						title: Clips.title,
+						username: Accounts.username,
+						video_duration: Clips.video_duration,
+						views: Clips.views,
+					})
+					.from(Clips)
+					.where(eq(Clips.uploader_id, account.id))
+					.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
+					.limit(8)
+					.all()
 			: [];
 
 		const fromFriends = account
-			? database.select().from(Clips).where(ne(Clips.uploader_id, account.id)).limit(16).all()
+			? database
+					.select({
+						id: Clips.id,
+						uploader_id: Clips.uploader_id,
+						title: Clips.title,
+						username: Accounts.username,
+						video_duration: Clips.video_duration,
+						views: Clips.views,
+					})
+					.from(Clips)
+					.where(ne(Clips.uploader_id, account.id))
+					.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
+					.limit(16)
+					.all()
 			: [];
 
 		return {
@@ -38,29 +66,9 @@ export default class implements Route {
 			account: data.account,
 			body: html`
 				<h2>Recently uploaded</h2>
-				<ul class="clips">
-					${data.recentlyUploaded.map(
-						(clip) => html`
-							<li onclick="watch('${clip.id}')">
-								<video src="/content/${clip.uploader_id}/${clip.id}.mp4" poster="/content/${clip.uploader_id}/${clip.id}.jpg" muted loop preload="none" onmouseover="this.play()" onmouseout="this.pause()"></video>
-								<b>${clip.title}</b>
-								<p>${data.account!.username}</p>
-							</li>
-						`
-					)}
-				</ul>
+				${clipPreviews(data.recentlyUploaded)}
 				<h2>From friends</h2>
-				<ul class="clips">
-					${data.fromFriends.map(
-						(clip) => html`
-							<li onclick="watch('${clip.id}')">
-								<video src="/content/${clip.uploader_id}/${clip.id}.mp4" poster="/content/${clip.uploader_id}/${clip.id}.jpg" muted loop preload="none" onmouseover="this.play()" onmouseout="this.pause()"></video>
-								<b>${clip.title}</b>
-								<p>${data.account!.username}</p>
-							</li>
-						`
-					)}
-				</ul>
+				${clipPreviews(data.fromFriends)}
 				<script>
 					function watch(id) {
 						window.location.href = "/watch/" + id;
