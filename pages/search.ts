@@ -8,7 +8,12 @@ import { ClipPreview, clipPreviews } from "../src/templates/clipPreviews";
 import { z } from "zod";
 
 const schema = z.object({
-	q: z.string().min(2).max(100).trim(),
+	q: z
+		.string()
+		.min(2)
+		.max(100)
+		.trim()
+		.transform((s) => s.replaceAll("+", " ")),
 });
 
 const query = sqlite.prepare(

@@ -36,6 +36,13 @@
       "when": 1700015786248,
       "tag": "0004_wooden_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1700024242812,
+      "tag": "0005_lovely_abomination",
+      "breakpoints": true
     }
   ]
 }
