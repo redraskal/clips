@@ -1,5 +1,7 @@
 import { html } from "gateway";
 
+export const dateTimeFormat = new Intl.DateTimeFormat("en-US");
+
 export function formatViews(views: number) {
 	return html`${views} view${views != 1 ? "s" : ""}`;
 }

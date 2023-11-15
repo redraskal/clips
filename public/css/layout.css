@@ -38,6 +38,11 @@ nav > ul > li > a:hover {
 	color: var(--green);
 }
 
+nav > form {
+	display: flex;
+	align-items: center;
+}
+
 ul.clips {
 	display: flex;
 	flex-wrap: wrap;

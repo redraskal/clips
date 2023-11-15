@@ -69,13 +69,15 @@ export default class implements Route {
 		const editable = data.account?.id == data.clip!.uploader_id;
 		data.clip!.views += 1;
 
+		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
+
 		return site({
 			path: `/watch/${data.clip!.id}`,
 			account: data.account,
 			body: html`
 				<video src="${data.root}.mp4" poster="${data.root}.jpg" autoplay muted controls loop download></video>
 				<h1 ${editable ? "contenteditable" : ""}>${data.clip!.title}</h1>
-				<p>${data.uploader!.username} • ${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}</p>
+				<p><a href="/@${data.uploader!.username}">${data.uploader!.username}</a> • ${views}</p>
 				<p ${editable ? 'placeholder="Click to edit description." contenteditable' : ""}>
 					${data.clip!.description || ""}
 				</p>

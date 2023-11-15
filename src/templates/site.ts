@@ -19,10 +19,14 @@ export function site(params: SiteParams) {
 					<a href="/upload">Upload</a>
 				</li>
 			</ul>
+			<form action="/search">
+				<input type="text" id="search" name="q" placeholder="Search for clips..." />
+			</form>
 			<ul>
-				<li>${params.account ? html` <a href="/logout">Logout</a> ` : html` <a href="/login">Login</a> `}</li>
+				<li>${params.account ? html`<a href="/logout">Logout</a>` : html`<a href="/login">Login</a>`}</li>
 			</ul>
 		</nav>
 		<main>${params.body}</main>
+		<script src="/js/search.js"></script>
 	`;
 }

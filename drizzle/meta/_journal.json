@@ -29,6 +29,13 @@
       "when": 1699668298432,
       "tag": "0003_steep_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1700015786248,
+      "tag": "0004_wooden_yellow_claw",
+      "breakpoints": true
     }
   ]
 }

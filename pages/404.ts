@@ -1,6 +1,14 @@
 import { Route, html } from "gateway";
+import { meta } from "../src/templates/meta";
 
 export default class implements Route {
+	head() {
+		return meta({
+			title: "404",
+			description: "Page not found",
+		});
+	}
+
 	body() {
 		return html`
 			<h1>Page not found</h1>
