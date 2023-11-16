@@ -14,6 +14,10 @@ export default class implements Route {
 	}
 
 	body(data: Data<this>) {
-		return new Response(Bun.file(data._path).slice(data._start, data._end));
+		return new Response(Bun.file(data._path).slice(data._start, data._end), {
+			headers: {
+				"Cache-Control": "max-age=3600",
+			},
+		});
 	}
 }
