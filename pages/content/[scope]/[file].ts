@@ -14,7 +14,13 @@ export default class implements Route {
 	}
 
 	body(data: Data<this>) {
-		return new Response(Bun.file(data._path).slice(data._start, data._end), {
+		// disabled until bun supports http2
+		// return new Response(Bun.file(data._path).slice(data._start, data._end), {
+		// 	headers: {
+		// 		"Cache-Control": "max-age=3600",
+		// 	},
+		// });
+		return new Response(Bun.file(data._path), {
 			headers: {
 				"Cache-Control": "max-age=3600",
 			},

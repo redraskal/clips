@@ -1,0 +1,95 @@
+input:not([type="submit"]),
+select {
+	display: block;
+	background: var(--background);
+	color: var(--foreground);
+	border: var(--border-width) solid var(--accents-2);
+	outline: none;
+	font-weight: 400;
+	transition: background 0.2s ease;
+}
+
+input:focus,
+select:focus {
+	border-color: var(--accents-6);
+}
+
+input:focus:not([type="submit"]),
+select:focus {
+	background: var(--accents-2);
+}
+
+input:disabled,
+select:disabled {
+	background: var(--accents-1);
+	color: var(--accents-3);
+	border-color: var(--accents-3);
+	cursor: not-allowed;
+}
+
+input[type="password"] {
+	font-family: -apple-system, Verdana;
+}
+
+input[type="submit"] {
+	margin-top: var(--padding);
+}
+
+input:not([type="submit"], [type="checkbox"]) {
+	padding: var(--padding) calc(2 * var(--padding)) var(--padding) calc(2 * var(--padding));
+}
+
+select:not(:disabled) {
+	cursor: pointer;
+}
+
+input[type="file"]:not(:disabled) {
+	cursor: pointer;
+}
+
+input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	padding: var(--padding);
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	appearance: none;
+	vertical-align: middle;
+	user-select: none;
+	cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+	background: var(--foreground);
+	border-color: var(--foreground);
+}
+
+input[type="checkbox"]:checked::after {
+	color: var(--background);
+	content: "✓";
+	position: absolute;
+}
+
+input[type="checkbox"]:disabled {
+	background: var(--accents-3);
+	border-color: var(--accents-3);
+}
+
+input[type="checkbox"]:disabled + label {
+	cursor: not-allowed;
+}
+
+label {
+	user-select: none;
+	cursor: pointer;
+	text-align: left;
+	text-transform: uppercase;
+	font-weight: 500;
+}
+
+/** fix spacing with labels next to checkboxes */
+label:not(label + input[type="checkbox"]):not(input[type="checkbox"] + label) {
+	margin-bottom: calc(var(--padding) * -1);
+	line-height: 1em;
+}
