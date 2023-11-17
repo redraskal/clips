@@ -13,7 +13,7 @@ import { site } from "../src/templates/site";
 export default class implements Route {
 	@ensureSignedIn()
 	async data(req: Request) {
-		if (req.method == "GET") return { account: inferAccount(req) };
+		if (req.method == "GET") return { _account: inferAccount(req) };
 		if (req.method != "POST") return {};
 
 		const account = inferAccount(req)!;
@@ -43,7 +43,7 @@ export default class implements Route {
 		database.update(Clips).set({ video_duration: duration }).where(eq(Clips.id, clip.id)).run();
 
 		return {
-			account,
+			_account: account,
 		};
 	}
 
@@ -53,63 +53,16 @@ export default class implements Route {
 		});
 	}
 
-	body(data: Data<this>, err?: Error) {
+	body(data: Data<this>) {
 		return site({
 			path: "/upload",
-			account: data.account,
+			account: data._account,
 			body: html`
-				<style>
-					#drag {
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						width: 1000px;
-						height: 500px;
-						border: 3px dashed white;
-						cursor: pointer;
-					}
-				</style>
 				<h1>Upload clips</h1>
 				<p id="progress"></p>
 				<input type="file" id="file" multiple accept="video/mp4" style="display: none" />
 				<div id="drag">Drag clips here or click to upload</div>
-				<script>
-					const drag = document.getElementById("drag");
-					const file = document.getElementById("file");
-					const progress = document.getElementById("progress");
-
-					drag.addEventListener("dragover", (e) => e.preventDefault());
-					drag.addEventListener("click", () => file.click());
-					file.addEventListener("change", async (e) => {
-						await upload(e.target.files);
-					});
-					drag.addEventListener("drop", async (e) => {
-						e.preventDefault();
-						await upload(e.dataTransfer.files);
-					});
-
-					function pushProgress(text) {
-						progress.innerText += text;
-						progress.innerHTML += "<br />";
-					}
-
-					async function upload(files) {
-						for (let i = 0; i < files.length; i++) {
-							const file = files[i];
-							const data = new FormData();
-							data.append("file", file, file.name);
-							pushProgress("[" + (i + 1) + "/" + files.length + "] Uploading " + file.name + "...");
-							await fetch("/upload", {
-								method: "POST",
-								headers: {
-									Accept: "application/json",
-								},
-								body: data,
-							});
-						}
-						window.location.href = "/";
-					}
-				</script>
+				<script src="/js/clips/upload.js"></script>
 			`,
 		});
 	}

@@ -116,6 +116,16 @@ p[placeholder]:empty:focus::before {
 	content: "";
 }
 
+#drag {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 1000px;
+	height: 500px;
+	border: 3px dashed white;
+	cursor: pointer;
+}
+
 @media screen and (max-width: 900px) {
 	nav {
 		flex-direction: row;

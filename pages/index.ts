@@ -47,7 +47,7 @@ export default class implements Route {
 			.all();
 
 		return {
-			account,
+			_account: account,
 			recentlyUploaded,
 			fromFriends,
 		};
@@ -63,12 +63,12 @@ export default class implements Route {
 		// prettier-ignore
 		return site({
 			path: "/",
-			account: data.account,
+			account: data._account,
 			body: html`
 				${data.recentlyUploaded.length > 0 ? html`
 					<h2>Recently uploaded</h2>
 					${clipPreviews(data.recentlyUploaded)}
-					<a href="/@${data.account?.username}">More clips -></a>
+					<a href="/@${data._account?.username}">More clips -></a>
 				` : ""}
 				<h2>From friends</h2>
 				${clipPreviews(data.fromFriends)}

@@ -49,10 +49,10 @@ export default class implements Route {
 		}
 
 		return {
-			root: `/content/${data.clips.uploader_id}/${data.clips.id}`,
+			_root: `/content/${data.clips.uploader_id}/${data.clips.id}`,
 			clip: data.clips,
 			uploader: data.accounts,
-			account: inferAccount(req),
+			_account: inferAccount(req),
 		};
 	}
 
@@ -60,71 +60,29 @@ export default class implements Route {
 		return meta({
 			title: data.clip!.title,
 			description: data.clip!.description || undefined,
-			image: `${data.root}.jpg`,
+			image: `${data._root}.jpg`,
 			video: `${process.env.WEBSITE_ROOT || ""}/content/${data.clip!.uploader_id}/${data.clip!.id}.mp4`,
 		});
 	}
 
 	body(data: Data<this>) {
-		const editable = data.account?.id == data.clip!.uploader_id;
+		const editable = data._account?.id == data.clip!.uploader_id;
 		data.clip!.views += 1;
 
 		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
 
 		return site({
 			path: `/watch/${data.clip!.id}`,
-			account: data.account,
+			account: data._account,
 			body: html`
-				<video src="${data.root}.mp4" poster="${data.root}.jpg" autoplay muted controls loop download></video>
+				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop download></video>
 				<h1 ${editable ? "contenteditable" : ""}>${data.clip!.title}</h1>
 				<p><a href="/@${data.uploader!.username}">${data.uploader!.username}</a> • ${views}</p>
 				<p ${editable ? 'placeholder="Click to edit description." contenteditable' : ""}>
 					${data.clip!.description || ""}
 				</p>
-				<a href="${data.root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
-				${editable
-					? html`
-							<script>
-								const title = document.querySelector("h1");
-								const originalTitle = title.textContent;
-								const description = document.querySelector("p:nth-child(4)");
-								let changed = false;
-								function save() {
-									if (!changed) return;
-									if (title.textContent.length < 1) {
-										title.textContent = originalTitle;
-										return;
-									}
-									description.textContent = description.textContent.trim();
-									fetch("", {
-										method: "POST",
-										headers: {
-											Accept: "application/json",
-											"Content-Type": "application/json",
-										},
-										body: JSON.stringify({
-											title: title.textContent,
-											description: description.textContent,
-										}),
-									});
-								}
-								title.addEventListener("keydown", (e) => {
-									if (e.which == 13) {
-										e.preventDefault();
-										e.target.blur();
-									}
-								});
-								title.addEventListener("input", () => {
-									changed = true;
-								});
-								description.addEventListener("input", () => {
-									changed = true;
-								});
-								title.addEventListener("blur", save);
-								description.addEventListener("blur", save);
-							</script>
-					  `
-					: ""}
+				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
+				${editable ? html`<script src="/js/clips/edit.js"></script>` : ""}
 			`,
 		});
 	}
