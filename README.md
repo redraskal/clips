@@ -2,6 +2,8 @@
 
 Self-hosted video game clips website harnessing the speed of Bun & bun:sqlite.
 
+**Work-in-progress, more documentation soontm**
+
 ## To install dependencies:
 
 ```bash
