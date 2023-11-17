@@ -1,4 +1,6 @@
-# Gateway template
+# Clips
+
+Self-hosted video game clips website harnessing the speed of Bun & bun:sqlite.
 
 ## To install dependencies:
 
