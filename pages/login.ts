@@ -98,7 +98,7 @@ export default class implements Route {
 		return site({
 			path: "/login",
 			body: html`
-				<h1>Clips</h1>
+				<h1>Login</h1>
 				<button onclick="window.location.href = '${process.env.DISCORD_OAUTH_URL}'">Sign in with Discord</button>
 			`,
 		});

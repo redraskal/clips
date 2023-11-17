@@ -115,3 +115,33 @@ p[placeholder]:empty::before {
 p[placeholder]:empty:focus::before {
 	content: "";
 }
+
+@media screen and (max-width: 900px) {
+	nav {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	nav > h2 {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	nav > form {
+		width: 100%;
+	}
+
+	nav > form > input {
+		width: 100%;
+	}
+
+	nav > ul,
+	nav > ul:nth-of-type(2) {
+		justify-content: center;
+		margin-left: 0;
+	}
+
+	ul.clips {
+		justify-content: center;
+	}
+}

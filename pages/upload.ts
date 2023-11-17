@@ -71,7 +71,7 @@ export default class implements Route {
 				</style>
 				<h1>Upload clips</h1>
 				<p id="progress"></p>
-				<input type="file" id="file" multiple accept="video/mp4" hidden />
+				<input type="file" id="file" multiple accept="video/mp4" style="display: none" />
 				<div id="drag">Drag clips here or click to upload</div>
 				<script>
 					const drag = document.getElementById("drag");
