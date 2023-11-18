@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.29.0",
-		"gateway": "redraskal/gateway#61f9bfc",
+		"gateway": "redraskal/gateway#7c20f39",
 		"nanoid": "^5.0.3",
 		"zod": "^3.22.4"
 	}
