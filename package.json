@@ -1,25 +1,25 @@
 {
-	"name": "clips",
-	"devDependencies": {
-		"drizzle-kit": "^0.20.1",
-		"prettier": "^3.0.0"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"scripts": {
-		"start": "bunx gateway",
-		"dev": "bunx gateway dev",
-		"gen": "bunx gateway gen",
-		"prettier": "prettier --write .",
-		"migrate:gen": "drizzle-kit generate:sqlite --schema src/schema",
-		"migrate": "bun ./src/migrate"
-	},
-	"dependencies": {
-		"@types/bun": "^1.0.4",
-		"drizzle-orm": "^0.29.0",
-		"gateway": "redraskal/gateway#4b6f670",
-		"nanoid": "^5.0.3",
-		"zod": "^3.22.4"
-	}
+  "name": "clips",
+  "devDependencies": {
+    "@types/bun": "^1.0.4",
+    "drizzle-kit": "^0.20.1",
+    "prettier": "^3.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "bunx gateway",
+    "dev": "bunx gateway dev",
+    "gen": "bunx gateway gen",
+    "prettier": "prettier --write .",
+    "migrate:gen": "drizzle-kit generate:sqlite --schema src/schema",
+    "migrate": "bun ./src/migrate"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.29.0",
+    "gateway": "redraskal/gateway#4b6f670",
+    "nanoid": "^5.0.3",
+    "zod": "^3.22.4"
+  }
 }
