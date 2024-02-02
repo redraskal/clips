@@ -1,6 +1,5 @@
 import { MatchedRoute } from "bun";
-import { Data, Route, html } from "gateway";
-import { meta } from "../../src/templates/meta";
+import { Data, Route, html, meta } from "gateway";
 import { database } from "../../src/database";
 import { Clips } from "../../src/schema/clips";
 import { eq, sql } from "drizzle-orm";
@@ -8,6 +7,7 @@ import { Accounts } from "../../src/schema/accounts";
 import { site } from "../../src/templates/site";
 import { inferAccount } from "../../src/middleware/auth";
 import { z } from "zod";
+import { style } from "../../src/templates/style";
 
 const editSchema = z
 	.object({
@@ -57,12 +57,13 @@ export default class implements Route {
 	}
 
 	head(data: Data<this>) {
-		return meta({
-			title: data.clip!.title,
-			description: data.clip!.description || undefined,
-			image: `${data._root}.jpg`,
-			video: `${process.env.WEBSITE_ROOT || ""}/content/${data.clip!.uploader_id}/${data.clip!.id}.mp4`,
-		});
+		return (
+			meta({
+				title: data.clip!.title + " | Clips",
+				description: data.clip!.description || undefined,
+				imageURL: `${data._root}.jpg`,
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {

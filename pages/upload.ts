@@ -1,6 +1,5 @@
-import { Data, Route, html } from "gateway";
+import { Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
-import { meta } from "../src/templates/meta";
 import { mkdir } from "fs/promises";
 import { join, parse } from "path";
 import { database } from "../src/database";
@@ -9,7 +8,9 @@ import { File } from "buffer";
 import { generateThumbnail, videoDuration } from "../src/ffmpeg";
 import { eq } from "drizzle-orm";
 import { site } from "../src/templates/site";
+import { style } from "../src/templates/style";
 
+@cache("head")
 export default class implements Route {
 	@ensureSignedIn()
 	async data(req: Request) {
@@ -48,9 +49,11 @@ export default class implements Route {
 	}
 
 	head() {
-		return meta({
-			title: "Upload",
-		});
+		return (
+			meta({
+				title: "Upload | Clips",
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {

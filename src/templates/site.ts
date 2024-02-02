@@ -1,9 +1,9 @@
-import { HTMLTemplateString, html } from "gateway";
+import { html } from "gateway";
 import { Accounts } from "../schema/accounts";
 
 type SiteParams = {
 	path: string;
-	body: HTMLTemplateString;
+	body: string;
 	account?: typeof Accounts.$inferSelect;
 };
 

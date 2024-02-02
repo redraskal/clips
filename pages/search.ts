@@ -1,11 +1,11 @@
 import { MatchedRoute } from "bun";
-import { Data, Route, html } from "gateway";
-import { meta } from "../src/templates/meta";
+import { Data, Route, cache, html, meta } from "gateway";
 import { sqlite } from "../src/database";
 import { site } from "../src/templates/site";
 import { inferAccount } from "../src/middleware/auth";
 import { ClipPreview, clipPreviews } from "../src/templates/clipPreviews";
 import { z } from "zod";
+import { style } from "../src/templates/style";
 
 const schema = z.object({
 	q: z
@@ -39,6 +39,7 @@ const query = sqlite.prepare(
 		)`
 );
 
+@cache("head")
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
 		const data = await schema.parseAsync(route.query);
@@ -51,10 +52,12 @@ export default class implements Route {
 		};
 	}
 
-	head(data: Data<this>) {
-		return meta({
-			title: "Search results",
-		});
+	head() {
+		return (
+			meta({
+				title: "Search results | Clips",
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {

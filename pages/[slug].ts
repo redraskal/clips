@@ -1,6 +1,5 @@
 import { MatchedRoute } from "bun";
-import { Data, Route, html } from "gateway";
-import { meta } from "../src/templates/meta";
+import { Data, Route, html, meta } from "gateway";
 import { database } from "../src/database";
 import { inferAccount } from "../src/middleware/auth";
 import { Clips } from "../src/schema/clips";
@@ -10,6 +9,7 @@ import { clipPreviews } from "../src/templates/clipPreviews";
 import { site } from "../src/templates/site";
 import { dateTimeFormat } from "../src/utils";
 import { snowflakeToDate } from "../src/snowflake";
+import { style } from "../src/templates/style";
 
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
@@ -51,9 +51,11 @@ export default class implements Route {
 	}
 
 	head(data: Data<this>) {
-		return meta({
-			title: data ? data.account.username : "404",
-		});
+		return (
+			meta({
+				title: data ? data.account.username + " | Clips" : "404 | Clips",
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {

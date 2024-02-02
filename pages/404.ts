@@ -1,12 +1,15 @@
-import { Route, html } from "gateway";
-import { meta } from "../src/templates/meta";
+import { Route, cache, html, meta } from "gateway";
+import { style } from "../src/templates/style";
 
+@cache()
 export default class implements Route {
 	head() {
-		return meta({
-			title: "404",
-			description: "Page not found",
-		});
+		return (
+			meta({
+				title: "404 | Clips",
+				description: "Page not found",
+			}) + style
+		);
 	}
 
 	body() {

@@ -1,15 +1,16 @@
-import { Data, Route, html } from "gateway";
+import { Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedOut } from "../src/middleware/auth";
-import { meta } from "../src/templates/meta";
 import { MatchedRoute } from "bun";
 import { Accounts } from "../src/schema/accounts";
 import { database } from "../src/database";
 import { Sessions } from "../src/schema/sessions";
 import { site } from "../src/templates/site";
 import { whitelist } from "../src/whitelist";
+import { style } from "../src/templates/style";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
 
+@cache("head")
 export default class implements Route {
 	@ensureSignedOut()
 	async data(req: Request, route: MatchedRoute) {
@@ -29,7 +30,7 @@ export default class implements Route {
 				code,
 				redirect_uri: process.env.DISCORD_REDIRECT_URI!,
 			}),
-		}).then((res) => res.json());
+		}).then((res) => res.json() as { access_token?: string });
 
 		if (!token.access_token) {
 			console.debug(token);
@@ -40,7 +41,7 @@ export default class implements Route {
 			headers: {
 				Authorization: `Bearer ${token.access_token}`,
 			},
-		}).then((res) => res.json());
+		}).then((res) => res.json() as { user?: any });
 
 		if (!me.user) {
 			console.debug(me);
@@ -81,16 +82,19 @@ export default class implements Route {
 	}
 
 	head() {
-		return meta({
-			title: "Login",
-		});
+		return (
+			meta({
+				title: "Login | Clips",
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {
 		if (data?.token) {
+			const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
 			return Response.redirect("/", {
 				headers: {
-					"set-cookie": `clips=${encodeURIComponent(data.token)}; Secure; HttpOnly`,
+					"set-cookie": `clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; Secure; HttpOnly`,
 				},
 			});
 		}

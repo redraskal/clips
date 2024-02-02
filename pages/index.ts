@@ -1,13 +1,14 @@
-import { Data, Route, html } from "gateway";
+import { Data, Route, cache, html, meta } from "gateway";
 import { inferAccount } from "../src/middleware/auth";
-import { meta } from "../src/templates/meta";
 import { database } from "../src/database";
 import { Clips } from "../src/schema/clips";
 import { site } from "../src/templates/site";
 import { desc, eq, ne } from "drizzle-orm";
 import { clipPreviews } from "../src/templates/clipPreviews";
 import { Accounts } from "../src/schema/accounts";
+import { style } from "../src/templates/style";
 
+@cache("head")
 export default class implements Route {
 	async data(req: Request) {
 		const account = inferAccount(req);
@@ -54,9 +55,11 @@ export default class implements Route {
 	}
 
 	head() {
-		return meta({
-			title: "Home",
-		});
+		return (
+			meta({
+				title: "Home | Clips",
+			}) + style
+		);
 	}
 
 	body(data: Data<this>) {
