@@ -27,6 +27,10 @@ function save() {
 	});
 }
 
+function shouldFocus() {
+	return document.activeElement !== title && document.activeElement !== description;
+}
+
 title.addEventListener("keydown", (e) => {
 	if (e.which == 13) {
 		e.preventDefault();
@@ -43,3 +47,16 @@ description.addEventListener("input", () => {
 
 title.addEventListener("blur", save);
 description.addEventListener("blur", save);
+
+document.addEventListener("keydown", (e) => {
+	if (e.keyCode == 84 && shouldFocus()) {
+		// t
+		e.preventDefault();
+		title.focus();
+	}
+	if (e.keyCode == 68 && shouldFocus()) {
+		// d
+		e.preventDefault();
+		description.focus();
+	}
+});
