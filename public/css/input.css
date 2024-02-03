@@ -35,7 +35,7 @@ input[type="submit"] {
 	margin-top: var(--padding);
 }
 
-input:not([type="submit"], [type="checkbox"]) {
+input:not([type="submit"]) {
 	padding: var(--padding) calc(2 * var(--padding)) var(--padding) calc(2 * var(--padding));
 }
 
@@ -47,49 +47,10 @@ input[type="file"]:not(:disabled) {
 	cursor: pointer;
 }
 
-input[type="checkbox"] {
-	width: 20px;
-	height: 20px;
-	padding: var(--padding);
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	appearance: none;
-	vertical-align: middle;
-	user-select: none;
-	cursor: pointer;
-}
-
-input[type="checkbox"]:checked {
-	background: var(--foreground);
-	border-color: var(--foreground);
-}
-
-input[type="checkbox"]:checked::after {
-	color: var(--background);
-	content: "✓";
-	position: absolute;
-}
-
-input[type="checkbox"]:disabled {
-	background: var(--accents-3);
-	border-color: var(--accents-3);
-}
-
-input[type="checkbox"]:disabled + label {
-	cursor: not-allowed;
-}
-
 label {
 	user-select: none;
 	cursor: pointer;
 	text-align: left;
 	text-transform: uppercase;
 	font-weight: 500;
-}
-
-/** fix spacing with labels next to checkboxes */
-label:not(label + input[type="checkbox"]):not(input[type="checkbox"] + label) {
-	margin-bottom: calc(var(--padding) * -1);
-	line-height: 1em;
 }

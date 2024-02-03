@@ -9,39 +9,39 @@ nav {
 	background: var(--accents-1);
 	padding-left: var(--gap);
 	padding-right: var(--gap);
-}
 
-nav > ul {
-	width: 100%;
-	display: flex;
-	margin-left: calc(var(--gap) * 2);
-	gap: calc(var(--gap) * 2);
-	list-style-type: none;
-	padding: 0;
-}
+	> ul {
+		width: 100%;
+		display: flex;
+		margin-left: calc(var(--gap) * 2);
+		gap: calc(var(--gap) * 2);
+		list-style-type: none;
+		padding: 0;
 
-nav > ul:nth-of-type(2) {
-	justify-content: end;
-}
+		> li {
+			display: flex;
+			align-items: center;
 
-nav > ul > li {
-	display: flex;
-	align-items: center;
-}
+			> a {
+				text-decoration: none;
+				font-size: large;
+				font-weight: 500;
 
-nav > ul > li > a {
-	text-decoration: none;
-	font-size: large;
-	font-weight: 500;
-}
+				&:hover {
+					color: var(--green);
+				}
+			}
+		}
+	}
 
-nav > ul > li > a:hover {
-	color: var(--green);
-}
+	> ul:nth-of-type(2) {
+		justify-content: end;
+	}
 
-nav > form {
-	display: flex;
-	align-items: center;
+	> form {
+		display: flex;
+		align-items: center;
+	}
 }
 
 ul.clips {
@@ -50,45 +50,45 @@ ul.clips {
 	gap: var(--gap);
 	list-style-type: none;
 	padding: 0;
-}
 
-ul.clips > li > div {
-	position: relative;
-	width: 400px;
-	cursor: pointer;
-}
+	> li > div {
+		position: relative;
+		width: 400px;
+		cursor: pointer;
 
-ul.clips > li > div > span {
-	position: absolute;
-	background: color-mix(in srgb, var(--background), transparent 30%);
-	padding-left: var(--border-radius);
-	padding-right: var(--border-radius);
-}
+		> span {
+			position: absolute;
+			background: color-mix(in srgb, var(--background), transparent 30%);
+			padding-left: var(--border-radius);
+			padding-right: var(--border-radius);
 
-ul.clips > li > div > span:nth-of-type(1) {
-	top: var(--border-radius);
-	left: var(--border-radius);
-}
+			&:nth-of-type(1) {
+				top: var(--border-radius);
+				left: var(--border-radius);
+			}
 
-ul.clips > li > div > span:nth-of-type(2) {
-	bottom: var(--border-radius);
-	left: var(--border-radius);
-}
+			&:nth-of-type(2) {
+				bottom: var(--border-radius);
+				left: var(--border-radius);
+			}
 
-ul.clips > li > div > span:nth-of-type(3) {
-	bottom: var(--border-radius);
-	right: var(--border-radius);
-}
+			&:nth-of-type(3) {
+				bottom: var(--border-radius);
+				right: var(--border-radius);
+			}
+		}
+	}
 
-ul.clips > li > p {
-	margin: 0;
-}
+	> li > p {
+		margin: 0;
+	}
 
-ul.clips > li > video {
-	background: var(--background);
-	cursor: pointer;
-	border-radius: var(--border-radius);
-	margin-bottom: 0.3rem;
+	> li > video {
+		background: var(--background);
+		cursor: pointer;
+		border-radius: var(--border-radius);
+		margin-bottom: 0.3rem;
+	}
 }
 
 video[controls] {
@@ -106,14 +106,16 @@ h1 {
 	padding: 0;
 }
 
-p[placeholder]:empty::before {
-	content: attr(placeholder);
-	color: var(--accents-4);
-	cursor: text;
-}
+p[placeholder]:empty {
+	&::before {
+		content: attr(placeholder);
+		color: var(--accents-4);
+		cursor: text;
+	}
 
-p[placeholder]:empty:focus::before {
-	content: "";
+	&:focus::before {
+		content: "";
+	}
 }
 
 #drag {
@@ -130,24 +132,29 @@ p[placeholder]:empty:focus::before {
 	nav {
 		flex-direction: row;
 		flex-wrap: wrap;
+
+		> h2 {
+			display: none;
+		}
+
+		> form {
+			width: 100%;
+
+			> input {
+				width: 100%;
+			}
+		}
+
+		> ul,
+		> ul:nth-of-type(2) {
+			justify-content: center;
+			margin-left: 0;
+		}
 	}
 
-	nav > h2 {
-		display: none;
-	}
-
-	nav > form {
-		width: 100%;
-	}
-
-	nav > form > input {
-		width: 100%;
-	}
-
-	nav > ul,
-	nav > ul:nth-of-type(2) {
-		justify-content: center;
-		margin-left: 0;
+	nav,
+	main {
+		padding: 0;
 	}
 
 	ul.clips {
