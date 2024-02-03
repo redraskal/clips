@@ -19,7 +19,7 @@ const schema = z.object({
 const selectSearchResults = sqlite.query(
 	`
 		SELECT * FROM (
-			SELECT clip_id AS id, uploader_id, clips.title AS title, (SELECT username FROM accounts WHERE accounts.id = id) AS username, video_duration, views
+			SELECT clip_id AS id, uploader_id, clips.title AS title, (SELECT username FROM accounts WHERE accounts.id = uploader_id) AS username, video_duration, views
 				FROM clips_fts($query)
 				JOIN clips ON clips_fts.clip_id = clips.id
 				LIMIT 15
@@ -32,7 +32,7 @@ const selectSearchResults = sqlite.query(
 					JOIN accounts ON accounts_fts.account_id = accounts.id
 					LIMIT 4
 			)
-			SELECT clips.id as id, uploader_id, title, (SELECT username FROM accounts WHERE accounts.id = id) AS username, video_duration, views
+			SELECT clips.id as id, uploader_id, title, (SELECT username FROM accounts WHERE accounts.id = uploader_id) AS username, video_duration, views
 			FROM clips
 			WHERE clips.uploader_id IN selected
 			ORDER BY id DESC LIMIT 12
