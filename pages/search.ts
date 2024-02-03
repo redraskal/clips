@@ -10,7 +10,7 @@ import { style } from "../src/templates/style";
 const schema = z.object({
 	q: z
 		.string()
-		.min(2)
+		.min(3)
 		.max(100)
 		.trim()
 		.transform((s) => s.replaceAll("+", " ")),

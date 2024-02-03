@@ -41,8 +41,6 @@ export default class implements Route {
 
 		if (!data || !data.clips || !data.accounts) throw new Error("Clip not found.");
 
-		incrementViews.run({ id: route.params.id });
-
 		const account = inferAccount(req);
 
 		if (req.method == "POST" || req.method == "DELETE") {
@@ -91,6 +89,8 @@ export default class implements Route {
 
 	body(data: Data<this>) {
 		if (data.deleted) return Response.redirect("/");
+
+		incrementViews.run({ id: data.clip!.id });
 
 		const editable =
 			data._account && (data._account.id == data.clip.uploader_id || admins.includes(data._account.discord_id));

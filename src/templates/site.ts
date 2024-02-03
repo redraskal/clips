@@ -20,7 +20,15 @@ export function site(params: SiteParams) {
 				</li>
 			</ul>
 			<form action="/search">
-				<input type="text" id="search" name="q" placeholder="Search for clips..." required />
+				<input
+					type="text"
+					id="search"
+					name="q"
+					placeholder="Search for clips..."
+					minlength="3"
+					maxlength="100"
+					required
+				/>
 			</form>
 			<ul>
 				<li>${params.account ? html`<a href="/logout">Logout</a>` : html`<a href="/login">Login</a>`}</li>
