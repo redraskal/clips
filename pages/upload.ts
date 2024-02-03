@@ -6,9 +6,29 @@ import { database } from "../src/database";
 import { Clips } from "../src/schema/clips";
 import { File } from "buffer";
 import { generateThumbnail, videoDuration } from "../src/ffmpeg";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { site } from "../src/templates/site";
 import { style } from "../src/templates/style";
+import { snowflake } from "../src/snowflake";
+
+const insertClip = database
+	.insert(Clips)
+	.values({
+		id: sql.placeholder("id"),
+		title: sql.placeholder("title"),
+		uploader_id: sql.placeholder("uploader_id"),
+		video_duration: -1,
+	})
+	.returning()
+	.prepare();
+
+// type error is drizzle bug
+const updateVideoDuration = database
+	.update(Clips)
+	// @ts-ignore
+	.set({ video_duration: sql.placeholder("video_duration") })
+	.where(eq(Clips.id, sql.placeholder("id")))
+	.prepare();
 
 @cache("head")
 export default class implements Route {
@@ -27,21 +47,22 @@ export default class implements Route {
 		const root = join(process.env.STORAGE_PATH!, account.id);
 		await mkdir(root, { recursive: true });
 
-		const clip = database
-			.insert(Clips)
-			.values({
-				title: parse(file.name).name,
-				uploader_id: account.id,
-				video_duration: -1,
-			})
-			.returning()
-			.get();
+		const clip = insertClip.get({
+			id: snowflake().toString(),
+			title: parse(file.name).name,
+			uploader_id: account.id,
+		});
 
 		const path = join(root, `${clip.id}.mp4`);
 		await Bun.write(path, file as unknown as Blob);
+
 		const duration = await videoDuration(path);
 		await generateThumbnail(path, duration / 2, join(root, `${clip.id}.jpg`));
-		database.update(Clips).set({ video_duration: duration }).where(eq(Clips.id, clip.id)).run();
+
+		updateVideoDuration.run({
+			id: clip.id,
+			video_duration: duration,
+		});
 
 		return {
 			_account: account,

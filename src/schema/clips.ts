@@ -1,11 +1,8 @@
 import { int, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { snowflake } from "../snowflake";
 import { Accounts } from "./accounts";
 
 export const Clips = sqliteTable("clips", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => snowflake().toString()),
+	id: text("id").primaryKey(),
 	title: text("title").notNull(),
 	description: text("description"),
 	uploader_id: text("uploader_id")

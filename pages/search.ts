@@ -16,7 +16,7 @@ const schema = z.object({
 		.transform((s) => s.replaceAll("+", " ")),
 });
 
-const query = sqlite.prepare(
+const selectSearchResults = sqlite.query(
 	`
 		SELECT * FROM (
 			SELECT clip_id AS id, uploader_id, clips.title AS title, (SELECT username FROM accounts WHERE accounts.id = id) AS username, video_duration, views
@@ -43,7 +43,7 @@ const query = sqlite.prepare(
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
 		const data = await schema.parseAsync(route.query);
-		const results = query.all({ $query: data.q }) as ClipPreview[];
+		const results = selectSearchResults.all({ $query: data.q }) as ClipPreview[];
 
 		return {
 			_account: inferAccount(req),

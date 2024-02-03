@@ -17,24 +17,28 @@ const editSchema = z
 	.partial()
 	.refine((data) => !!data.title || !!data.description, "title or description must be present.");
 
+const selectClip = database
+	.select()
+	.from(Clips)
+	.where(eq(Clips.id, sql.placeholder("id")))
+	.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
+	.prepare();
+
+const incrementViews = database
+	.update(Clips)
+	.set({
+		views: sql`${Clips.views} + 1`,
+	})
+	.where(eq(Clips.id, sql.placeholder("id")))
+	.prepare();
+
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
-		const data = database
-			.select()
-			.from(Clips)
-			.where(eq(Clips.id, route.params.id))
-			.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
-			.get();
+		const data = selectClip.get({ id: route.params.id });
 
 		if (!data || !data.clips || !data.accounts) throw new Error("Clip not found.");
 
-		database
-			.update(Clips)
-			.set({
-				views: sql`${Clips.views} + 1`,
-			})
-			.where(eq(Clips.id, route.params.id))
-			.run();
+		incrementViews.run({ id: route.params.id });
 
 		const account = inferAccount(req);
 
@@ -43,6 +47,7 @@ export default class implements Route {
 
 			if (account?.id != data.clips.uploader_id) throw new Error("Account is not uploader.");
 
+			// this does not work well as a prepared statement on drizzle with a dynamic body
 			database.update(Clips).set(body).where(eq(Clips.id, route.params.id)).run();
 
 			return {};

@@ -7,8 +7,40 @@ import { Sessions } from "../src/schema/sessions";
 import { site } from "../src/templates/site";
 import { whitelist } from "../src/whitelist";
 import { style } from "../src/templates/style";
+import { sql } from "drizzle-orm";
+import { snowflake } from "../src/snowflake";
+import { nanoid } from "nanoid";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
+
+const insertAccount = database
+	.insert(Accounts)
+	.values({
+		id: sql.placeholder("id"),
+		discord_id: sql.placeholder("discord_id"),
+		username: sql.placeholder("username"),
+		discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
+	})
+	.onConflictDoUpdate({
+		target: Accounts.discord_id,
+		set: {
+			// @ts-ignore - this works, why is the type wrong?
+			discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
+		},
+	})
+	.returning({
+		id: Accounts.id,
+	})
+	.prepare();
+
+const insertSession = database
+	.insert(Sessions)
+	.values({
+		id: sql.placeholder("id"),
+		account_id: sql.placeholder("account_id"),
+	})
+	.returning()
+	.prepare();
 
 @cache("head")
 export default class implements Route {
@@ -33,7 +65,6 @@ export default class implements Route {
 		}).then((res) => res.json() as { access_token?: string });
 
 		if (!token.access_token) {
-			console.debug(token);
 			throw new Error("Could not authenticate Discord account.");
 		}
 
@@ -44,37 +75,19 @@ export default class implements Route {
 		}).then((res) => res.json() as { user?: any });
 
 		if (!me.user) {
-			console.debug(me);
 			throw new Error("Could not authenticate Discord account.");
 		}
 		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
 
-		// https://github.com/drizzle-team/drizzle-orm/issues/777
-		const user = database
-			.insert(Accounts)
-			.values({
+		const session = insertSession.get({
+			id: nanoid(50),
+			account_id: insertAccount.get({
+				id: snowflake().toString(),
 				discord_id: me.user.id,
 				username: me.user.username,
 				discord_avatar_hash: me.user.avatar,
-			})
-			.onConflictDoUpdate({
-				target: Accounts.discord_id,
-				set: {
-					discord_avatar_hash: me.user.avatar,
-				},
-			})
-			.returning({
-				id: Accounts.id,
-			})
-			.get();
-
-		const session = database
-			.insert(Sessions)
-			.values({
-				account_id: user!.id,
-			})
-			.returning()
-			.get();
+			}).id,
+		});
 
 		return {
 			token: session.id,
