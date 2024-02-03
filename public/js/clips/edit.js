@@ -12,6 +12,7 @@ function save() {
 	}
 
 	description.textContent = description.textContent.trim();
+	document.title = `${title.textContent} | Clips`;
 
 	fetch("", {
 		method: "POST",
