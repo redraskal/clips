@@ -45,10 +45,10 @@ export default class implements Route {
 
 		const account = inferAccount(req);
 
-		console.log(req.method);
-
 		if (req.method == "POST" || req.method == "DELETE") {
-			if (account?.id != data.clips.uploader_id && account?.id! in admins) throw new Error("Account is not uploader.");
+			if (!account?.id || (account.id != data.clips.uploader_id && !(account.id in admins))) {
+				throw new Error("Account is not uploader.");
+			}
 
 			if (req.headers.get("accept") == "application/json" && req.method == "POST") {
 				const body = await editSchema.parseAsync(await req.json());
@@ -90,7 +90,7 @@ export default class implements Route {
 	body(data: Data<this>) {
 		if (data.deleted) return Response.redirect("/");
 
-		const editable = data._account?.id == data.clip!.uploader_id;
+		const editable = data._account && (data._account.id == data.clip!.uploader_id || data._account.id in admins);
 		data.clip!.views += 1;
 
 		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
@@ -106,15 +106,15 @@ export default class implements Route {
 					${data.clip!.description || ""}
 				</p>
 				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
-				${editable || (data._account && data._account.id in admins)
+				${editable
 					? html`
 							<form method="POST">
 								<input type="hidden" name="_method" value="DELETE" />
 								<input type="submit" value="Delete" />
 							</form>
+							<script src="/js/clips/edit.js"></script>
 						`
 					: ""}
-				${editable ? html`<script src="/js/clips/edit.js"></script>` : ""}
 				<script src="/js/clips/watch.js"></script>
 			`,
 		});

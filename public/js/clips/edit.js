@@ -50,7 +50,7 @@ title.addEventListener("blur", save);
 description.addEventListener("blur", save);
 
 document.addEventListener("keydown", (e) => {
-	if (e.keyCode != 84 && e.keyCode != 68 && !shouldFocus()) return;
+	if ((e.keyCode != 84 && e.keyCode != 68) || !shouldFocus()) return;
 	e.preventDefault();
 	if (e.keyCode == 84) {
 		// t
