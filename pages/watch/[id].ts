@@ -82,7 +82,7 @@ export default class implements Route {
 			meta({
 				title: data.clip!.title + " | Clips",
 				description: data.clip!.description || undefined,
-				imageURL: `${data._root}.jpg`,
+				imageURL: `${process.env.WEBSITE_ROOT || ""}${data._root}.jpg`,
 			}) + style
 		);
 	}
