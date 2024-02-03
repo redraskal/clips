@@ -46,7 +46,9 @@ export default class implements Route {
 		const account = inferAccount(req);
 
 		if (req.method == "POST" || req.method == "DELETE") {
-			if (!account?.id || (account.id != data.clips.uploader_id && !(account.id in admins))) {
+			const editable = account && (account.id == data.clips.uploader_id || account.discord_id in admins);
+
+			if (!editable) {
 				throw new Error("Account is not uploader.");
 			}
 
@@ -90,7 +92,7 @@ export default class implements Route {
 	body(data: Data<this>) {
 		if (data.deleted) return Response.redirect("/");
 
-		const editable = data._account && (data._account.id == data.clip!.uploader_id || data._account.id in admins);
+		const editable = data._account && (data._account.id == data.clip.uploader_id || data._account.discord_id in admins);
 		data.clip!.views += 1;
 
 		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
