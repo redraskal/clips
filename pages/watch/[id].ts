@@ -98,6 +98,8 @@ export default class implements Route {
 
 		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
 
+		// description must contain no whitespace because css :empty is fun
+		// prettier-ignore
 		return site({
 			path: `/watch/${data.clip!.id}`,
 			account: data._account,
@@ -105,9 +107,7 @@ export default class implements Route {
 				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop download></video>
 				<h1 ${editable ? "contenteditable" : ""}>${data.clip!.title}</h1>
 				<p><a href="/@${data.uploader!.username}">${data.uploader!.username}</a> • ${views}</p>
-				<p ${editable ? 'placeholder="Click to edit description." contenteditable' : ""}>
-					${data.clip!.description || ""}
-				</p>
+				<p ${editable ? 'placeholder="Click to edit description." contenteditable' : ""}>${data.clip!.description || ""}</p>
 				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
 				${editable
 					? html`

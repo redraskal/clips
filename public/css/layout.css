@@ -133,8 +133,7 @@ p[placeholder]:empty:focus::before {
 	}
 
 	nav > h2 {
-		margin-left: auto;
-		margin-right: auto;
+		display: none;
 	}
 
 	nav > form {
