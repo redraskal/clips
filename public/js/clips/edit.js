@@ -1,6 +1,7 @@
 const title = document.querySelector("h1");
 const originalTitle = title.textContent;
 const description = document.querySelector("p:nth-child(4)");
+
 let changed = false;
 
 function save() {
@@ -28,7 +29,7 @@ function save() {
 }
 
 function shouldFocus() {
-	return document.activeElement !== title && document.activeElement !== description;
+	return !document.activeElement.getAttribute("contenteditable") && document.activeElement.tagName !== "INPUT";
 }
 
 title.addEventListener("keydown", (e) => {
@@ -49,14 +50,13 @@ title.addEventListener("blur", save);
 description.addEventListener("blur", save);
 
 document.addEventListener("keydown", (e) => {
-	if (e.keyCode == 84 && shouldFocus()) {
+	if (e.keyCode != 84 && e.keyCode != 68 && !shouldFocus()) return;
+	e.preventDefault();
+	if (e.keyCode == 84) {
 		// t
-		e.preventDefault();
 		title.focus();
-	}
-	if (e.keyCode == 68 && shouldFocus()) {
+	} else {
 		// d
-		e.preventDefault();
 		description.focus();
 	}
 });

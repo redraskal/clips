@@ -89,6 +89,7 @@ export default class implements Route {
 				</p>
 				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
 				${editable ? html`<script src="/js/clips/edit.js"></script>` : ""}
+				<script src="/js/clips/watch.js"></script>
 			`,
 		});
 	}
