@@ -31,7 +31,7 @@ export function site(params: SiteParams) {
 				/>
 			</form>
 			<ul>
-				<li>${params.account ? html`<a href="/logout">Logout</a>` : html`<a href="/login">Login</a>`}</li>
+				<li><a href="/${params.account ? "logout" : "login"}">${params.account ? "Logout" : "Login"}</a></li>
 			</ul>
 		</nav>
 		<main>${params.body}</main>

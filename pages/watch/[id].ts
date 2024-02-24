@@ -1,5 +1,5 @@
-import { $, MatchedRoute } from "bun";
-import { Data, Route, html, meta } from "gateway";
+import type { MatchedRoute } from "bun";
+import { Route, html, meta, type Data } from "gateway";
 import { database } from "../../src/database";
 import { Clips } from "../../src/schema/clips";
 import { eq, sql } from "drizzle-orm";
@@ -10,7 +10,9 @@ import { z } from "zod";
 import { style } from "../../src/templates/style";
 import { join } from "path";
 import { unlink } from "fs/promises";
-import { admins } from "../../src/whitelist";
+import { admins, pluralize, storagePath } from "../../src/utils";
+
+const websiteRoot = process.env.WEBSITE_ROOT || "";
 
 const editSchema = z
 	.object({
@@ -42,10 +44,9 @@ export default class implements Route {
 		if (!data || !data.clips || !data.accounts) throw new Error("Clip not found.");
 
 		const account = inferAccount(req);
+		const editable = account && (account.id == data.clips.uploader_id || admins.includes(account.discord_id));
 
 		if (req.method == "POST" || req.method == "DELETE") {
-			const editable = account && (account.id == data.clips.uploader_id || admins.includes(account.discord_id));
-
 			if (!editable) {
 				throw new Error("Account is not uploader.");
 			}
@@ -53,15 +54,16 @@ export default class implements Route {
 			if (req.headers.get("accept") == "application/json" && req.method == "POST") {
 				const body = await editSchema.parseAsync(await req.json());
 
-				// this does not work well as a prepared statement on drizzle with a dynamic body
+				// TODO: this does not work well as a prepared statement on drizzle with a dynamic body
 				database.update(Clips).set(body).where(eq(Clips.id, route.params.id)).run();
 
-				return { edited: true };
+				return {};
 			} else if (req.method == "DELETE" || (await req.formData()).get("_method") == "DELETE") {
-				const root = join(process.env.STORAGE_PATH!, data.clips.uploader_id);
+				const root = join(storagePath, data.clips.uploader_id);
 
-				await unlink(join(root, `${data.clips.id}.mp4`));
-				await unlink(join(root, `${data.clips.id}.jpg`));
+				for (const ext of ["mp4", "jpg"]) {
+					await unlink(join(root, `${data.clips.id}.${ext}`));
+				}
 
 				database.delete(Clips).where(eq(Clips.id, route.params.id)).run();
 
@@ -71,53 +73,53 @@ export default class implements Route {
 
 		return {
 			_root: `/content/${data.clips.uploader_id}/${data.clips.id}`,
+			_account: account,
 			clip: data.clips,
 			uploader: data.accounts,
-			_account: inferAccount(req),
+			editable,
 		};
 	}
 
 	head(data: Data<this>) {
+		if (!data.clip) return "";
 		return (
 			meta({
-				title: data.clip!.title + " | Clips",
-				description: data.clip!.description || undefined,
-				imageURL: `${process.env.WEBSITE_ROOT || ""}${data._root}.jpg`,
+				title: data.clip.title + " | Clips",
+				description: data.clip.description,
+				imageURL: `${websiteRoot}${data._root}.jpg`,
 			}) + style
 		);
 	}
 
 	body(data: Data<this>) {
-		if (data.deleted) return Response.redirect("/");
+		if (data.deleted) return Response.redirect("/", 302);
+		if (!data.clip) throw new Error("Clip not available in body.");
 
-		incrementViews.run({ id: data.clip!.id });
-
-		const editable =
-			data._account && (data._account.id == data.clip.uploader_id || admins.includes(data._account.discord_id));
+		// only increment views when clip is seen in a browser
+		incrementViews.run({ id: data.clip.id });
 		data.clip!.views += 1;
 
-		const views = html`${data.clip!.views} view${data.clip!.views != 1 ? "s" : ""}`;
+		const views = pluralize(data.clip.views, "view");
 
 		// description must contain no whitespace because css :empty is fun
 		// prettier-ignore
 		return site({
-			path: `/watch/${data.clip!.id}`,
+			path: `/watch/${data.clip.id}`,
 			account: data._account,
 			body: html`
-				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop download></video>
-				<h1 ${editable ? "contenteditable" : ""}>${data.clip!.title}</h1>
-				<p><a href="/@${data.uploader!.username}">${data.uploader!.username}</a> • ${views}</p>
-				<p ${editable ? 'placeholder="Click to edit description." contenteditable' : ""}>${data.clip!.description || ""}</p>
-				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
-				${editable
-					? html`
+				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop></video>
+				<h1 ${data.editable && "contenteditable"}>${data.clip.title}</h1>
+				<p><a href="/@${data.uploader!.username}">${data.uploader.username}</a> • ${views}</p>
+				<p ${data.editable && 'placeholder="Click to edit description." contenteditable'}>${data.clip.description}</p>
+				<a href="${data._root}.mp4" download="${data.clip.title}.mp4"><button>Download</button></a>
+				${data.editable
+					&& html`
 							<form method="POST">
 								<input type="hidden" name="_method" value="DELETE" />
 								<input type="submit" value="Delete" />
 							</form>
 							<script src="/js/clips/edit.js"></script>
-						`
-					: ""}
+						`}
 				<script src="/js/clips/watch.js"></script>
 			`,
 		});

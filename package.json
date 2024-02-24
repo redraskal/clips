@@ -13,12 +13,11 @@
 		"dev": "bunx gateway dev",
 		"gen": "bunx gateway gen",
 		"prettier": "prettier --write .",
-		"migrate:gen": "drizzle-kit generate:sqlite --schema src/schema",
-		"migrate": "bun ./src/migrate"
+		"drizzle": "drizzle-kit generate:sqlite --schema src/schema"
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.29.0",
-		"gateway": "redraskal/gateway#4b6f670",
+		"gateway": "redraskal/gateway#cce37eb",
 		"nanoid": "^5.0.3",
 		"zod": "^3.22.4"
 	}

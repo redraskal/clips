@@ -1,4 +1,4 @@
-import { MatchedRoute } from "bun";
+import type { MatchedRoute } from "bun";
 import { RouteError } from "gateway";
 import { database } from "../database";
 import { Sessions } from "../schema/sessions";

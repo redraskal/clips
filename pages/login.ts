@@ -1,15 +1,15 @@
-import { Data, Route, cache, html, meta } from "gateway";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedOut } from "../src/middleware/auth";
-import { MatchedRoute } from "bun";
+import type { MatchedRoute } from "bun";
 import { Accounts } from "../src/schema/accounts";
 import { database } from "../src/database";
 import { Sessions } from "../src/schema/sessions";
 import { site } from "../src/templates/site";
-import { whitelist } from "../src/whitelist";
 import { style } from "../src/templates/style";
 import { sql } from "drizzle-orm";
 import { snowflake } from "../src/snowflake";
 import { nanoid } from "nanoid";
+import { whitelist } from "../src/utils";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
 
@@ -24,6 +24,7 @@ const insertAccount = database
 	.onConflictDoUpdate({
 		target: Accounts.discord_id,
 		set: {
+			// TODO
 			// @ts-ignore - this works, why is the type wrong?
 			discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
 		},
@@ -60,7 +61,7 @@ export default class implements Route {
 			body: new URLSearchParams({
 				grant_type: "authorization_code",
 				code,
-				redirect_uri: process.env.DISCORD_REDIRECT_URI!,
+				redirect_uri: process.env.DISCORD_REDIRECT_URI,
 			}),
 		}).then((res) => res.json() as { access_token?: string });
 
@@ -102,21 +103,31 @@ export default class implements Route {
 		);
 	}
 
-	body(data: Data<this>) {
+	body(data: Data<this>, err?: Error) {
 		if (data?.token) {
+			const response = Response.redirect("/", 302);
 			const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-			return Response.redirect("/", {
-				headers: {
-					"set-cookie": `clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; Secure; HttpOnly`,
-				},
-			});
+
+			response.headers.set(
+				"Set-Cookie",
+				`clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite: none; Secure; HttpOnly`
+			);
+
+			return response;
 		}
 
 		return site({
 			path: "/login",
 			body: html`
 				<h1>Login</h1>
-				<button onclick="window.location.href = '${process.env.DISCORD_OAUTH_URL}'">Sign in with Discord</button>
+				${err && html`<p>${err.message}</p>`}
+				<form action="https://discord.com/api/oauth2/authorize">
+					<input type="hidden" name="client_id" value="${process.env.DISCORD_CLIENT_ID}" />
+					<input type="hidden" name="redirect_uri" value="${process.env.DISCORD_REDIRECT_URI}" />
+					<input type="hidden" name="response_type" value="code" />
+					<input type="hidden" name="scope" value="identify" />
+					<input type="submit" value="Sign in with Discord" />
+				</form>
 			`,
 		});
 	}

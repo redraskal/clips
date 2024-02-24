@@ -4,12 +4,13 @@ const progress = document.getElementById("progress");
 
 drag.addEventListener("dragover", (e) => e.preventDefault());
 drag.addEventListener("click", () => file.click());
-file.addEventListener("change", async (e) => {
-	await upload(e.target.files);
-});
 drag.addEventListener("drop", async (e) => {
 	e.preventDefault();
 	await upload(e.dataTransfer.files);
+});
+
+file.addEventListener("change", async (e) => {
+	await upload(e.target.files);
 });
 
 function pushProgress(text) {

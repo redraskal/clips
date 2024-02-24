@@ -1,4 +1,4 @@
-import { Data, Route, cache, html, meta } from "gateway";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { inferAccount } from "../src/middleware/auth";
 import { database } from "../src/database";
 import { Clips } from "../src/schema/clips";
@@ -46,7 +46,6 @@ export default class implements Route {
 		const account = inferAccount(req);
 
 		const recentlyUploaded = account ? selectRecentlyUploadedClips.all({ uploader_id: account.id }) : [];
-
 		const fromFriends = selectClipsFromFriends.all({ account_id: account?.id || 0 });
 
 		return {
@@ -76,8 +75,12 @@ export default class implements Route {
 							<a href="/@${data._account?.username}">More clips -></a>
 						`
 					: ""}
-				<h2>From friends</h2>
-				${clipPreviews(data.fromFriends)}
+				${data.fromFriends.length > 0
+					? html`
+							<h2>From friends</h2>
+							${clipPreviews(data.fromFriends)}
+						`
+					: ""}
 				<script>
 					function watch(id) {
 						window.location.href = "/watch/" + id;

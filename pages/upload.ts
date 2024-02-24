@@ -1,4 +1,4 @@
-import { Data, Route, cache, html, meta } from "gateway";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
 import { mkdir } from "fs/promises";
 import { join, parse } from "path";
@@ -10,6 +10,7 @@ import { eq, sql } from "drizzle-orm";
 import { site } from "../src/templates/site";
 import { style } from "../src/templates/style";
 import { snowflake } from "../src/snowflake";
+import { storagePath } from "../src/utils";
 
 const insertClip = database
 	.insert(Clips)
@@ -44,7 +45,7 @@ export default class implements Route {
 		if (!file) throw new Error("No files specified.");
 		if (file.type != "video/mp4") throw new Error("Only mp4 files are supported.");
 
-		const root = join(process.env.STORAGE_PATH!, account.id);
+		const root = join(storagePath, account.id);
 		await mkdir(root, { recursive: true });
 
 		const clip = insertClip.get({

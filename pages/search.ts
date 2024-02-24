@@ -1,9 +1,9 @@
-import { MatchedRoute } from "bun";
-import { Data, Route, cache, html, meta } from "gateway";
+import type { MatchedRoute } from "bun";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { sqlite } from "../src/database";
 import { site } from "../src/templates/site";
 import { inferAccount } from "../src/middleware/auth";
-import { ClipPreview, clipPreviews } from "../src/templates/clipPreviews";
+import { type ClipPreview, clipPreviews } from "../src/templates/clipPreviews";
 import { z } from "zod";
 import { style } from "../src/templates/style";
 
