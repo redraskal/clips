@@ -5,11 +5,11 @@ import { Accounts } from "../src/schema/accounts";
 import { database } from "../src/database";
 import { Sessions } from "../src/schema/sessions";
 import { site } from "../src/templates/site";
-import { whitelist } from "../src/whitelist";
 import { style } from "../src/templates/style";
 import { sql } from "drizzle-orm";
 import { snowflake } from "../src/snowflake";
 import { nanoid } from "nanoid";
+import { whitelist } from "../src/utils";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
 
@@ -61,7 +61,7 @@ export default class implements Route {
 			body: new URLSearchParams({
 				grant_type: "authorization_code",
 				code,
-				redirect_uri: process.env.DISCORD_REDIRECT_URI!,
+				redirect_uri: process.env.DISCORD_REDIRECT_URI,
 			}),
 		}).then((res) => res.json() as { access_token?: string });
 

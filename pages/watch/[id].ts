@@ -10,8 +10,9 @@ import { z } from "zod";
 import { style } from "../../src/templates/style";
 import { join } from "path";
 import { unlink } from "fs/promises";
-import { admins } from "../../src/whitelist";
-import { pluralize } from "../../src/utils";
+import { admins, pluralize, storagePath } from "../../src/utils";
+
+const websiteRoot = process.env.WEBSITE_ROOT || "";
 
 const editSchema = z
 	.object({
@@ -58,7 +59,7 @@ export default class implements Route {
 
 				return {};
 			} else if (req.method == "DELETE" || (await req.formData()).get("_method") == "DELETE") {
-				const root = join(process.env.STORAGE_PATH!, data.clips.uploader_id);
+				const root = join(storagePath, data.clips.uploader_id);
 
 				for (const ext of ["mp4", "jpg"]) {
 					await unlink(join(root, `${data.clips.id}.${ext}`));
@@ -85,7 +86,7 @@ export default class implements Route {
 			meta({
 				title: data.clip.title + " | Clips",
 				description: data.clip.description,
-				imageURL: `${process.env.WEBSITE_ROOT || ""}${data._root}.jpg`,
+				imageURL: `${websiteRoot}${data._root}.jpg`,
 			}) + style
 		);
 	}
