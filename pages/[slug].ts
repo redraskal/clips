@@ -1,5 +1,5 @@
-import { MatchedRoute } from "bun";
-import { Data, Route, html, meta } from "gateway";
+import type { MatchedRoute } from "bun";
+import { type Data, Route, html, meta } from "gateway";
 import { database } from "../src/database";
 import { inferAccount } from "../src/middleware/auth";
 import { Clips } from "../src/schema/clips";
@@ -57,27 +57,25 @@ export default class implements Route {
 	head(data: Data<this>) {
 		return (
 			meta({
-				title: data ? data.account.username + " | Clips" : "404 | Clips",
+				title: `${data?.account.username || "404"} | Clips`,
 			}) + style
 		);
 	}
 
 	body(data: Data<this>) {
-		if (!data) return Response.redirect("/404");
+		if (!data) return Response.redirect("/404", 302);
 
 		return site({
 			path: `/@${data.account.username}`,
 			account: data._account,
 			body: html`
-				${data.account.discord_avatar_hash
-					? html`
-							<br />
-							<img
-								src="https://cdn.discordapp.com/avatars/${data.account.discord_id}/${data.account
-									.discord_avatar_hash}.png"
-							/>
-						`
-					: ""}
+				${data.account.discord_avatar_hash &&
+				html`
+					<br />
+					<img
+						src="https://cdn.discordapp.com/avatars/${data.account.discord_id}/${data.account.discord_avatar_hash}.png"
+					/>
+				`}
 				<h2>${data.account.username}</h2>
 				<p>Registered ${dateTimeFormat.format(snowflakeToDate(BigInt(data.account.id)))}</p>
 				${data.clips.length > 0 ? clipPreviews(data.clips) : html`<p>No clips found.</p>`}

@@ -12,5 +12,5 @@ export function formatDuration(seconds: number) {
 }
 
 export function pluralize(n: number, word: string) {
-	return n == 1 ? word : word + "s";
+	return `${n} ${word}${n != 1 ? "s" : ""}`;
 }

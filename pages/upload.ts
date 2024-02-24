@@ -1,4 +1,4 @@
-import { Data, Route, cache, html, meta } from "gateway";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
 import { mkdir } from "fs/promises";
 import { join, parse } from "path";

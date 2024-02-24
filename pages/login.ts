@@ -1,6 +1,6 @@
-import { Data, Route, cache, html, meta } from "gateway";
+import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedOut } from "../src/middleware/auth";
-import { MatchedRoute } from "bun";
+import type { MatchedRoute } from "bun";
 import { Accounts } from "../src/schema/accounts";
 import { database } from "../src/database";
 import { Sessions } from "../src/schema/sessions";
@@ -105,12 +105,15 @@ export default class implements Route {
 
 	body(data: Data<this>, err?: Error) {
 		if (data?.token) {
+			const response = Response.redirect("/", 302);
 			const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-			return Response.redirect("/", {
-				headers: {
-					"set-cookie": `clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite: none; Secure; HttpOnly`,
-				},
-			});
+
+			response.headers.set(
+				"Set-Cookie",
+				`clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite: none; Secure; HttpOnly`
+			);
+
+			return response;
 		}
 
 		return site({

@@ -56,12 +56,12 @@ export default class implements Route {
 				// TODO: this does not work well as a prepared statement on drizzle with a dynamic body
 				database.update(Clips).set(body).where(eq(Clips.id, route.params.id)).run();
 
-				return { edited: true };
+				return {};
 			} else if (req.method == "DELETE" || (await req.formData()).get("_method") == "DELETE") {
 				const root = join(process.env.STORAGE_PATH!, data.clips.uploader_id);
 
 				for (const ext of ["mp4", "jpg"]) {
-					await unlink(join(root, data.clips.id + "." + ext));
+					await unlink(join(root, `${data.clips.id}.${ext}`));
 				}
 
 				database.delete(Clips).where(eq(Clips.id, route.params.id)).run();
@@ -80,10 +80,11 @@ export default class implements Route {
 	}
 
 	head(data: Data<this>) {
+		if (!data.clip) return "";
 		return (
 			meta({
-				title: data.clip!.title + " | Clips",
-				description: data.clip!.description || undefined,
+				title: data.clip.title + " | Clips",
+				description: data.clip.description,
 				imageURL: `${process.env.WEBSITE_ROOT || ""}${data._root}.jpg`,
 			}) + style
 		);
@@ -91,23 +92,25 @@ export default class implements Route {
 
 	body(data: Data<this>) {
 		if (data.deleted) return Response.redirect("/", 302);
+		if (!data.clip) throw new Error("Clip not available in body.");
 
-		incrementViews.run({ id: data.clip!.id });
+		// only increment views when clip is seen in a browser
+		incrementViews.run({ id: data.clip.id });
 		data.clip!.views += 1;
 
-		const views = pluralize(data.clip!.views, "view");
+		const views = pluralize(data.clip.views, "view");
 
 		// description must contain no whitespace because css :empty is fun
 		// prettier-ignore
 		return site({
-			path: `/watch/${data.clip!.id}`,
+			path: `/watch/${data.clip.id}`,
 			account: data._account,
 			body: html`
-				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop download></video>
-				<h1 ${data.editable ? "contenteditable" : ""}>${data.clip!.title}</h1>
-				<p><a href="/@${data.uploader!.username}">${data.uploader!.username}</a> • ${views}</p>
-				<p ${data.editable && 'placeholder="Click to edit description." contenteditable'}>${data.clip!.description || ""}</p>
-				<a href="${data._root}.mp4" download="${data.clip!.title}.mp4"><button>Download</button></a>
+				<video src="${data._root}.mp4" poster="${data._root}.jpg" autoplay muted controls loop></video>
+				<h1 ${data.editable && "contenteditable"}>${data.clip.title}</h1>
+				<p><a href="/@${data.uploader!.username}">${data.uploader.username}</a> • ${views}</p>
+				<p ${data.editable && 'placeholder="Click to edit description." contenteditable'}>${data.clip.description}</p>
+				<a href="${data._root}.mp4" download="${data.clip.title}.mp4"><button>Download</button></a>
 				${data.editable
 					&& html`
 							<form method="POST">

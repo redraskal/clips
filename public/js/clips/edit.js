@@ -29,7 +29,7 @@ function save() {
 }
 
 function shouldFocus() {
-	return !document.activeElement.getAttribute("contenteditable") && document.activeElement.tagName !== "INPUT";
+	return !document.activeElement.hasAttribute("contenteditable") && document.activeElement.tagName !== "INPUT";
 }
 
 title.addEventListener("keydown", (e) => {

@@ -14,7 +14,7 @@ video.addEventListener("seeked", () => {
 	const url = new URL(location.href);
 	seeked = true;
 
-	url.searchParams.set("t", video.currentTime);
+	url.searchParams.set("t", video.currentTime.toFixed(2));
 	history.pushState(null, document.title, url);
 });
 
