@@ -19,7 +19,7 @@ export default class implements Route {
 
 		return {
 			_start: Math.max(0, _start),
-			_end: Math.max(_start + 3e7, _end), // at least a 30MB chunk
+			_end: Math.min(file.size - 1, Math.max(_start + 3e7, _end)), // at least a 30MB chunk
 			_path: path,
 			_file: file,
 		};
@@ -32,17 +32,14 @@ export default class implements Route {
 			});
 		}
 
-		data._end = Math.min(data._file.size - 1, data._end);
-		const incomplete = data._end < data._file.size - 1;
-
-		return new Response(data._file.slice(data._start, data._end), {
+		return new Response(data._file.slice(data._start, data._end + 1), {
 			headers: {
 				...cacheHeader,
 				...{
-					"Content-Range": `bytes ${data._start}-${data._end}/${data._file.size - 1}`,
+					"Content-Range": `bytes ${data._start}-${data._end}/${data._file.size}`,
 				},
 			},
-			status: incomplete ? 206 : undefined,
+			status: 206,
 		});
 	}
 }
