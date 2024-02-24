@@ -68,14 +68,19 @@ export default class implements Route {
 			path: "/",
 			account: data._account,
 			body: html`
-				${data.recentlyUploaded.length > 0 &&
-				html`
-					<h2>Recently uploaded</h2>
-					${clipPreviews(data.recentlyUploaded)}
-					<a href="/@${data._account?.username}">More clips -></a>
-				`}
-				<h2>From friends</h2>
-				${clipPreviews(data.fromFriends)}
+				${data.recentlyUploaded.length > 0
+					? html`
+							<h2>Recently uploaded</h2>
+							${clipPreviews(data.recentlyUploaded)}
+							<a href="/@${data._account?.username}">More clips -></a>
+						`
+					: ""}
+				${data.fromFriends.length > 0
+					? html`
+							<h2>From friends</h2>
+							${clipPreviews(data.fromFriends)}
+						`
+					: ""}
 				<script>
 					function watch(id) {
 						window.location.href = "/watch/" + id;
