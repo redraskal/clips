@@ -10,3 +10,7 @@ export function formatDuration(seconds: number) {
 	seconds = Math.round(seconds);
 	return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 }
+
+export function pluralize(n: number, word: string) {
+	return n == 1 ? word : word + "s";
+}

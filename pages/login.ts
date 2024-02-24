@@ -24,6 +24,7 @@ const insertAccount = database
 	.onConflictDoUpdate({
 		target: Accounts.discord_id,
 		set: {
+			// TODO
 			// @ts-ignore - this works, why is the type wrong?
 			discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
 		},
@@ -102,12 +103,12 @@ export default class implements Route {
 		);
 	}
 
-	body(data: Data<this>) {
+	body(data: Data<this>, err?: Error) {
 		if (data?.token) {
 			const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
 			return Response.redirect("/", {
 				headers: {
-					"set-cookie": `clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; Secure; HttpOnly`,
+					"set-cookie": `clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite: none; Secure; HttpOnly`,
 				},
 			});
 		}
@@ -116,7 +117,14 @@ export default class implements Route {
 			path: "/login",
 			body: html`
 				<h1>Login</h1>
-				<button onclick="window.location.href = '${process.env.DISCORD_OAUTH_URL}'">Sign in with Discord</button>
+				${err && html`<p>${err.message}</p>`}
+				<form action="https://discord.com/api/oauth2/authorize">
+					<input type="hidden" name="client_id" value="${process.env.DISCORD_CLIENT_ID}" />
+					<input type="hidden" name="redirect_uri" value="${process.env.DISCORD_REDIRECT_URI}" />
+					<input type="hidden" name="response_type" value="code" />
+					<input type="hidden" name="scope" value="identify" />
+					<input type="submit" value="Sign in with Discord" />
+				</form>
 			`,
 		});
 	}
