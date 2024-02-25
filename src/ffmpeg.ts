@@ -42,3 +42,17 @@ export async function generateThumbnail(input: string, at: number, output: strin
 		throw new Error(`ffmpeg: ${stderr}`);
 	}
 }
+
+export async function convertToMP4Container(input: Blob, output: string) {
+	// return await $`cat ${input} | ffmpeg -i pipe: -c copy -f mp4 pipe: > ${output}`;
+	const proc = Bun.spawn(["ffmpeg", "-i", "pipe:", "-c", "copy", output], {
+		stdin: input,
+	});
+	const stderr = await new Response(proc.stderr).text();
+
+	await proc.exited;
+
+	if (proc.exitCode! > 0) {
+		throw new Error(`ffmpeg (convert): ${stderr}`);
+	}
+}

@@ -5,7 +5,7 @@ import { join, parse } from "path";
 import { database } from "../src/database";
 import { Clips } from "../src/schema/clips";
 import { File } from "buffer";
-import { generateThumbnail, videoDuration } from "../src/ffmpeg";
+import { convertToMP4Container, generateThumbnail, videoDuration } from "../src/ffmpeg";
 import { eq, sql } from "drizzle-orm";
 import { site } from "../src/templates/site";
 import { style } from "../src/templates/style";
@@ -43,7 +43,8 @@ export default class implements Route {
 		const file = formData.get("file") as File;
 
 		if (!file) throw new Error("No files specified.");
-		if (file.type != "video/mp4") throw new Error("Only mp4 files are supported.");
+		if (file.type != "video/mp4" && file.type != "video/x-matroska")
+			throw new Error("Only mp4 & mkv files are supported.");
 
 		const root = join(storagePath, account.id);
 		await mkdir(root, { recursive: true });
@@ -55,7 +56,12 @@ export default class implements Route {
 		});
 
 		const path = join(root, `${clip.id}.mp4`);
-		await Bun.write(path, file as unknown as Blob);
+
+		if (file.type == "video/mp4") {
+			await Bun.write(path, file as unknown as Blob);
+		} else {
+			await convertToMP4Container(file as unknown as Blob, path);
+		}
 
 		const duration = await videoDuration(path);
 		await generateThumbnail(path, duration / 2, join(root, `${clip.id}.jpg`));
@@ -85,7 +91,7 @@ export default class implements Route {
 			body: html`
 				<h1>Upload clips</h1>
 				<p id="progress"></p>
-				<input type="file" id="file" multiple accept="video/mp4" style="display: none" />
+				<input type="file" id="file" multiple accept="video/mp4,video/x-matroska" style="display: none" />
 				<div id="drag">Drag clips here or click to upload</div>
 				<script src="/js/clips/upload.js"></script>
 			`,
