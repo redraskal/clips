@@ -46,8 +46,8 @@ description.addEventListener("input", () => {
 	changed = true;
 });
 
-title.addEventListener("blur", save);
-description.addEventListener("blur", save);
+title.addEventListener("focusout", save);
+description.addEventListener("focusout", save);
 
 document.addEventListener("keydown", (e) => {
 	if ((e.keyCode != 84 && e.keyCode != 68) || !shouldFocus()) return;

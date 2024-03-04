@@ -37,6 +37,7 @@ export default class implements Route {
 				...cacheHeader,
 				...{
 					"Content-Range": `bytes ${data._start}-${data._end}/${data._file.size}`,
+					"Accept-Ranges": "bytes",
 				},
 			},
 			status: 206,
