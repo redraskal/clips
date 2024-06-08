@@ -1,13 +1,13 @@
 import type { MatchedRoute } from "bun";
 import { Route, html, meta, type Data } from "gateway";
-import { db } from "../../src/database";
-import { site } from "../../src/templates/site";
-import { inferAccount } from "../../src/middleware/auth";
+import { db } from "../../../src/database";
+import { site } from "../../../src/templates/site";
+import { inferAccount } from "../../../src/middleware/auth";
 import { z } from "zod";
-import { style } from "../../src/templates/style";
+import { style } from "../../../src/templates/style";
 import { join } from "path";
 import { unlink } from "fs/promises";
-import { admins, pluralize, storagePath } from "../../src/utils";
+import { admins, pluralize, storagePath } from "../../../src/utils";
 
 const websiteRoot = process.env.WEBSITE_ROOT || "";
 
@@ -19,7 +19,7 @@ const editSchema = z
 	.partial()
 	.refine((data) => !!data.title || !!data.description, "title or description must be present.");
 
-const selectClip = db.query(`
+export const selectClip = db.query(`
 	select clips.id, clips.title, clips.description, clips.uploader_id, clips.video_duration, clips.views, accounts.discord_id, accounts.username
 	from clips
 	left join accounts on clips.uploader_id=accounts.id
@@ -90,8 +90,9 @@ export default class implements Route {
 			meta({
 				title: data.title + " | Clips",
 				description: data.description,
-				imageURL: `${websiteRoot}${data._root}.jpg`,
-			}) + style
+			}) +
+			style +
+			html` <link rel="alternate" type="application/json+oembed" href="${websiteRoot}/watch/${data.id}/oembed.json" /> `
 		);
 	}
 
