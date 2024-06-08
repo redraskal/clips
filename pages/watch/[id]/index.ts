@@ -45,7 +45,7 @@ export default class implements Route {
 		if (!data || !data.discord_id) throw new Error("Clip not found.");
 
 		const account = inferAccount(req);
-		const editable = account && (account.id == data.uploader_id || admins.includes(data.discord_id));
+		const editable = account && (account.id == data.uploader_id || admins.includes(account.discord_id));
 
 		if (req.method == "POST" || req.method == "DELETE") {
 			if (!editable) {
