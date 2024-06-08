@@ -17,6 +17,8 @@ export default class implements Route {
 
 		if (!data || !data.discord_id) throw new Error("Clip not found.");
 
+		const url = `${Bun.env.WEBSITE_ROOT}/content/${data.uploader_id}/${data.id}.jpg`;
+
 		return {
 			version: "1.0",
 			type: "photo",
@@ -25,9 +27,12 @@ export default class implements Route {
 			title: data.title,
 			author_name: data.username,
 			author_url: `${Bun.env.WEBSITE_ROOT}/@${data.username}`,
-			width: "1280",
-			height: "720",
-			url: `${Bun.env.WEBSITE_ROOT}/content/${data.uploader_id}/${data.id}.jpg`,
+			width: 1280,
+			height: 720,
+			url: url,
+			thumbnail_width: 1280,
+			thumbnail_height: 720,
+			thumbnail_url: url,
 		};
 	}
 }
