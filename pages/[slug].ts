@@ -1,51 +1,48 @@
 import type { MatchedRoute } from "bun";
 import { type Data, Route, html, meta } from "gateway";
-import { database } from "../src/database";
+import { db } from "../src/database";
 import { inferAccount } from "../src/middleware/auth";
-import { Clips } from "../src/schema/clips";
-import { Accounts } from "../src/schema/accounts";
-import { desc, eq, sql } from "drizzle-orm";
 import { clipPreviews } from "../src/templates/clipPreviews";
 import { site } from "../src/templates/site";
 import { dateTimeFormat } from "../src/utils";
 import { snowflakeToDate } from "../src/snowflake";
 import { style } from "../src/templates/style";
 
-const selectAccount = database
-	.select({
-		id: Accounts.id,
-		username: Accounts.username,
-		discord_id: Accounts.discord_id,
-		discord_avatar_hash: Accounts.discord_avatar_hash,
-	})
-	.from(Accounts)
-	.where(eq(Accounts.username, sql.placeholder("username")))
-	.prepare();
+const selectAccount = db.query(`
+	select id, username, discord_id, discord_avatar_hash
+	from accounts
+	where username=?
+`);
 
-const selectClips = database
-	.select({
-		id: Clips.id,
-		uploader_id: Clips.uploader_id,
-		title: Clips.title,
-		username: Accounts.username,
-		video_duration: Clips.video_duration,
-		views: Clips.views,
-	})
-	.from(Clips)
-	.where(eq(Clips.uploader_id, sql.placeholder("uploader_id")))
-	.leftJoin(Accounts, eq(Clips.uploader_id, Accounts.id))
-	.orderBy(desc(Clips.id))
-	.prepare();
+const selectClips = db.query(`
+	select clips.id, clips.uploader_id, clips.title, accounts.username, clips.video_duration, clips.views
+	from clips
+	left join accounts on clips.uploader_id=accounts.id
+	where clips.uploader_id=?
+	order by clips.id desc
+`);
 
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
 		if (!route.params.slug.startsWith("@")) return;
 
-		const account = selectAccount.get({ username: route.params.slug.slice(1) });
+		const account = selectAccount.get(route.params.slug.slice(1)) as {
+			id: string;
+			username: string;
+			discord_id: string;
+			discord_avatar_hash?: string;
+		};
 
 		if (!account) throw new Error("Account not found");
 
-		const clips = selectClips.all({ uploader_id: account.id });
+		const clips = selectClips.all(account.id) as {
+			id: string;
+			uploader_id: string;
+			title: string;
+			username: string | null;
+			video_duration: number;
+			views: number;
+		}[];
 
 		return {
 			_account: inferAccount(req),

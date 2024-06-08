@@ -1,47 +1,21 @@
 import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedOut } from "../src/middleware/auth";
 import type { MatchedRoute } from "bun";
-import { Accounts } from "../src/schema/accounts";
-import { database } from "../src/database";
-import { Sessions } from "../src/schema/sessions";
+import { db } from "../src/database";
 import { site } from "../src/templates/site";
 import { style } from "../src/templates/style";
-import { sql } from "drizzle-orm";
 import { snowflake } from "../src/snowflake";
 import { nanoid } from "nanoid";
 import { whitelist } from "../src/utils";
 
 const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
 
-const insertAccount = database
-	.insert(Accounts)
-	.values({
-		id: sql.placeholder("id"),
-		discord_id: sql.placeholder("discord_id"),
-		username: sql.placeholder("username"),
-		discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
-	})
-	.onConflictDoUpdate({
-		target: Accounts.discord_id,
-		set: {
-			// TODO
-			// @ts-ignore - this works, why is the type wrong?
-			discord_avatar_hash: sql.placeholder("discord_avatar_hash"),
-		},
-	})
-	.returning({
-		id: Accounts.id,
-	})
-	.prepare();
-
-const insertSession = database
-	.insert(Sessions)
-	.values({
-		id: sql.placeholder("id"),
-		account_id: sql.placeholder("account_id"),
-	})
-	.returning()
-	.prepare();
+const insertAccount = db.query(`
+	insert into accounts (id, discord_id, username, discord_avatar_hash) 
+	values ($account_id, $discord_id, $username, $discord_avatar_hash)
+	on conflict(discord_id) do update set discord_avatar_hash=$discord_avatar_hash
+`);
+const insertSession = db.query("insert into sessions (id, account_id) values ($session_id, $account_id)");
 
 @cache("head")
 export default class implements Route {
@@ -80,18 +54,22 @@ export default class implements Route {
 		}
 		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
 
-		const session = insertSession.get({
-			id: nanoid(50),
-			account_id: insertAccount.get({
-				id: snowflake().toString(),
-				discord_id: me.user.id,
-				username: me.user.username,
-				discord_avatar_hash: me.user.avatar,
-			}).id,
+		const $session_id = nanoid(50);
+		const $account_id = snowflake().toString();
+
+		insertAccount.run({
+			$account_id,
+			$discord_id: me.user.id,
+			$username: me.user.username,
+			$discord_avatar_hash: me.user.avatar,
+		});
+		insertSession.run({
+			$session_id,
+			$account_id,
 		});
 
 		return {
-			token: session.id,
+			token: $session_id,
 		};
 	}
 

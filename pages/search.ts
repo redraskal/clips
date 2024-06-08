@@ -1,6 +1,6 @@
 import type { MatchedRoute } from "bun";
 import { type Data, Route, cache, html, meta } from "gateway";
-import { sqlite } from "../src/database";
+import { db } from "../src/database";
 import { site } from "../src/templates/site";
 import { inferAccount } from "../src/middleware/auth";
 import { type ClipPreview, clipPreviews } from "../src/templates/clipPreviews";
@@ -16,7 +16,7 @@ const schema = z.object({
 		.transform((s) => s.replaceAll("+", " ")),
 });
 
-const selectSearchResults = sqlite.query(
+const selectSearchResults = db.query(
 	`
 		SELECT * FROM (
 			SELECT clip_id AS id, uploader_id, clips.title AS title, (SELECT username FROM accounts WHERE accounts.id = uploader_id) AS username, video_duration, views

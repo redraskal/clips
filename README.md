@@ -1,6 +1,6 @@
 # Clips
 
-Self-hosted video game clips website harnessing the speed of Bun & bun:sqlite.
+Self-hosted video game clips website using Bun & bun:sqlite.
 
 **Work-in-progress, more documentation soontm**
 

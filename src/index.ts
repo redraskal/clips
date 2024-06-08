@@ -1,4 +1,6 @@
 import { ZodError, z } from "zod";
+import { db } from "./database";
+import { migrate } from "bun-migrate";
 
 try {
 	z.object({
@@ -13,3 +15,5 @@ try {
 		process.exit(1);
 	}
 }
+
+await migrate(db);

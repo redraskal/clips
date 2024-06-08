@@ -1,10 +1,10 @@
 import { html } from "gateway";
-import { Accounts } from "../schema/accounts";
+import type { CachedAccount } from "../middleware/auth";
 
 type SiteParams = {
 	path: string;
 	body: string;
-	account?: typeof Accounts.$inferSelect;
+	account?: CachedAccount;
 };
 
 export function site(params: SiteParams) {

@@ -9,6 +9,5 @@ COPY package.json package.json
 COPY bun.lockb bun.lockb
 RUN bun install
 COPY . .
-COPY patch.ts node_modules/drizzle-orm/bun-sqlite/session.js
 EXPOSE 3000
 ENTRYPOINT ["bun", "start"]

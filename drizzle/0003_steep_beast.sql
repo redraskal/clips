@@ -1,1 +1,0 @@
-ALTER TABLE `clips` DROP COLUMN `video_path`;

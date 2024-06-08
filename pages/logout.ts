@@ -1,28 +1,24 @@
 import { Route } from "gateway";
 import { ensureSignedIn, sessionToken } from "../src/middleware/auth";
-import { Sessions } from "../src/schema/sessions";
-import { database } from "../src/database";
-import { eq, sql } from "drizzle-orm";
+import { db } from "../src/database";
 
-const deleteSession = database.delete(Sessions).where(eq(Sessions.id, sql.placeholder("token")));
+const deleteSessionByID = db.query("delete from sessions where id=?");
 
 export default class implements Route {
 	@ensureSignedIn()
 	async data(req: Request) {
 		const token = sessionToken(req);
 
-		if (!token) return {};
-
-		deleteSession.run({ token });
+		if (token) {
+			deleteSessionByID.run(token);
+		}
 
 		return {};
 	}
 
 	body() {
 		const response = Response.redirect("/login", 302);
-
 		response.headers.set("Set-Cookie", "clips=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
-
 		return response;
 	}
 }

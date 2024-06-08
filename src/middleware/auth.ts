@@ -1,22 +1,20 @@
 import type { MatchedRoute } from "bun";
 import { RouteError } from "gateway";
-import { database } from "../database";
-import { Sessions } from "../schema/sessions";
-import { eq, sql } from "drizzle-orm";
-import { Accounts } from "../schema/accounts";
+import { db } from "../database";
 
-const sq = database
-	.select()
-	.from(Sessions)
-	.where(eq(Sessions.id, sql.placeholder("session_id")))
-	.as("sq");
+export type CachedAccount = {
+	id: string;
+	username: string;
+	discord_id: string;
+	discord_avatar_hash: string | null;
+};
 
-const selectAccount = database
-	.select()
-	.from(Accounts)
-	.where(eq(Accounts.id, sq.account_id))
-	.leftJoin(sq, eq(Accounts.id, sq.account_id))
-	.prepare();
+const selectAccountBySessionID = db.query(`
+	select accounts.id, accounts.username, accounts.discord_id, accounts.discord_avatar_hash 
+	from accounts 
+	left join sessions on sessions.account_id=accounts.id 
+	where sessions.id=?
+`);
 
 export function parseCookie(req: Request) {
 	return req.headers
@@ -38,13 +36,13 @@ export function sessionToken(req: Request) {
 	return jsonToken ? jsonToken : cookie;
 }
 
-export function inferAccount(req: Request): typeof Accounts.$inferSelect | undefined {
+export function inferAccount(req: Request): CachedAccount | undefined {
 	// @ts-ignore
 	if (req._account) return req._account;
 
 	const token = sessionToken(req);
+	const account = selectAccountBySessionID.get(token) as CachedAccount;
 
-	const account = selectAccount.get({ session_id: token })?.accounts;
 	if (!account) return undefined;
 
 	// @ts-ignore

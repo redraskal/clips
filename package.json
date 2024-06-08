@@ -1,23 +1,22 @@
 {
 	"name": "clips",
 	"devDependencies": {
-		"@types/bun": "^1.0.4",
-		"drizzle-kit": "^0.20.1",
+		"@types/bun": "latest",
 		"prettier": "^3.0.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	},
 	"scripts": {
-		"start": "bunx gateway",
-		"dev": "bunx gateway dev",
-		"gen": "bunx gateway gen",
-		"prettier": "prettier --write .",
-		"drizzle": "drizzle-kit generate:sqlite --schema src/schema"
+		"start": "gateway",
+		"dev": "gateway dev",
+		"gen": "gateway gen",
+		"prettier": "prettier --write ."
 	},
 	"dependencies": {
-		"drizzle-orm": "^0.29.0",
-		"gateway": "redraskal/gateway#cce37eb",
+		"bun-kv": "redraskal/bun-kv#9963186",
+		"bun-migrate": "redraskal/bun-migrate#4a43cac",
+		"gateway": "redraskal/gateway#1b86da8",
 		"nanoid": "^5.0.3",
 		"zod": "^3.22.4"
 	}

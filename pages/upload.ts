@@ -2,34 +2,19 @@ import { type Data, Route, cache, html, meta } from "gateway";
 import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
 import { mkdir } from "fs/promises";
 import { join, parse } from "path";
-import { database } from "../src/database";
-import { Clips } from "../src/schema/clips";
+import { db } from "../src/database";
 import { File } from "buffer";
 import { convertToMP4Container, generateThumbnail, videoDuration } from "../src/ffmpeg";
-import { eq, sql } from "drizzle-orm";
 import { site } from "../src/templates/site";
 import { style } from "../src/templates/style";
 import { snowflake } from "../src/snowflake";
 import { storagePath } from "../src/utils";
 
-const insertClip = database
-	.insert(Clips)
-	.values({
-		id: sql.placeholder("id"),
-		title: sql.placeholder("title"),
-		uploader_id: sql.placeholder("uploader_id"),
-		video_duration: -1,
-	})
-	.returning()
-	.prepare();
-
-// type error is drizzle bug
-const updateVideoDuration = database
-	.update(Clips)
-	// @ts-ignore
-	.set({ video_duration: sql.placeholder("video_duration") })
-	.where(eq(Clips.id, sql.placeholder("id")))
-	.prepare();
+const insertClip = db.query(`
+	insert into clips (id, title, uploader_id, video_duration)
+	values ($id, $title, $uploader_id, -1)
+`);
+const updateClipDuration = db.query("update clips set video_duration=$video_duration where id=$id");
 
 @cache("head")
 export default class implements Route {
@@ -40,22 +25,26 @@ export default class implements Route {
 
 		const account = inferAccount(req)!;
 		const formData = await req.formData();
+		// @ts-ignore - File type is stupid and broken
 		const file = formData.get("file") as File;
 
 		if (!file) throw new Error("No files specified.");
-		if (file.type != "video/mp4" && file.type != "video/x-matroska")
+		if (file.type != "video/mp4" && file.type != "video/x-matroska") {
 			throw new Error("Only mp4 & mkv files are supported.");
+		}
 
 		const root = join(storagePath, account.id);
 		await mkdir(root, { recursive: true });
 
-		const clip = insertClip.get({
-			id: snowflake().toString(),
-			title: parse(file.name).name,
-			uploader_id: account.id,
+		const id = snowflake().toString();
+
+		insertClip.run({
+			$id: id,
+			$title: parse(file.name).name,
+			$uploader_id: account.id,
 		});
 
-		const path = join(root, `${clip.id}.mp4`);
+		const path = join(root, `${id}.mp4`);
 
 		if (file.type == "video/mp4") {
 			await Bun.write(path, file as unknown as Blob);
@@ -64,11 +53,11 @@ export default class implements Route {
 		}
 
 		const duration = await videoDuration(path);
-		await generateThumbnail(path, duration / 2, join(root, `${clip.id}.jpg`));
+		await generateThumbnail(path, duration / 2, join(root, `${id}.jpg`));
 
-		updateVideoDuration.run({
-			id: clip.id,
-			video_duration: duration,
+		updateClipDuration.run({
+			$id: id,
+			$video_duration: duration,
 		});
 
 		return {
