@@ -1,23 +1,23 @@
 {
-	"name": "clips",
-	"devDependencies": {
-		"@types/bun": "latest",
-		"prettier": "^3.0.0"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"scripts": {
-		"start": "gateway",
-		"dev": "gateway dev",
-		"gen": "gateway gen",
-		"prettier": "prettier --write ."
-	},
-	"dependencies": {
-		"bun-kv": "redraskal/bun-kv#9963186",
-		"bun-migrate": "redraskal/bun-migrate#4a43cac",
-		"gateway": "redraskal/gateway#1b86da8",
-		"nanoid": "^5.0.3",
-		"zod": "^3.22.4"
-	}
+  "name": "clips",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "gateway",
+    "dev": "gateway dev",
+    "gen": "gateway gen",
+    "prettier": "prettier --write ."
+  },
+  "dependencies": {
+    "bun-kv": "redraskal/bun-kv#9963186",
+    "bun-migrate": "redraskal/bun-migrate#4a43cac",
+    "gateway": "redraskal/gateway#a81da5e",
+    "nanoid": "^5.0.3",
+    "zod": "^3.22.4"
+  }
 }

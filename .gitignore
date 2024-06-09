@@ -1,7 +1,5 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
-# Logs
-
 logs
 _.log
 npm-debug.log_
@@ -11,6 +9,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 *.sqlite
 storage
+.deploy.toml
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 
