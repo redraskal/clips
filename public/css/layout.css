@@ -24,6 +24,7 @@ body {
 nav {
 	position: sticky;
 	top: 0;
+	z-index: 1;
 	display: flex;
 	padding-left: var(--gap);
 	padding-right: var(--gap);
@@ -73,6 +74,18 @@ ul.clips {
 	list-style-type: none;
 	padding: 0;
 
+	> li {
+		width: 400px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	> li b,
+	p {
+		margin: 0;
+	}
+
 	> li > div {
 		position: relative;
 		width: 400px;
@@ -99,10 +112,6 @@ ul.clips {
 				right: var(--border-radius);
 			}
 		}
-	}
-
-	> li > p {
-		margin: 0;
 	}
 
 	> li > video {
