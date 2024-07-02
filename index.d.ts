@@ -1,7 +1,6 @@
 declare module "bun" {
 	interface Env {
 		DATABASE?: string;
-		DATABASE_MIGRATE?: string;
 		DISCORD_ADMINS?: string;
 		DISCORD_CLIENT_ID: string;
 		DISCORD_CLIENT_SECRET: string;

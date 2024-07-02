@@ -47,3 +47,7 @@ input[type="button"] {
 	border-width: 0;
 	cursor: pointer;
 }
+
+a {
+	color: inherit;
+}

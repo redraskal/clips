@@ -22,8 +22,11 @@ async function upload(files) {
 	for (let i = 0; i < files.length; i++) {
 		const file = files[i];
 		const data = new FormData();
+
 		data.append("file", file, file.name);
+
 		pushProgress("[" + (i + 1) + "/" + files.length + "] Uploading " + file.name + "...");
+
 		await fetch("/upload", {
 			method: "POST",
 			headers: {

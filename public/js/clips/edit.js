@@ -13,7 +13,7 @@ function save() {
 	}
 
 	description.textContent = description.textContent.trim();
-	document.title = `${title.textContent} | Clips`;
+	document.title = title.textContent;
 
 	fetch("", {
 		method: "POST",
@@ -33,7 +33,7 @@ function shouldFocus() {
 }
 
 title.addEventListener("keydown", (e) => {
-	if (e.which == 13) {
+	if (e.key == "Enter") {
 		e.preventDefault();
 		e.target.blur();
 	}
@@ -50,13 +50,12 @@ title.addEventListener("focusout", save);
 description.addEventListener("focusout", save);
 
 document.addEventListener("keydown", (e) => {
-	if ((e.keyCode != 84 && e.keyCode != 68) || !shouldFocus()) return;
+	if ((e.key != "t" && e.key != "d") || !shouldFocus()) return;
 	e.preventDefault();
-	if (e.keyCode == 84) {
-		// t
+
+	if (e.key == "t") {
 		title.focus();
 	} else {
-		// d
 		description.focus();
 	}
 });

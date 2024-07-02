@@ -54,22 +54,22 @@ export default class implements Route {
 		}
 		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
 
-		const $session_id = nanoid(50);
-		const $account_id = snowflake().toString();
+		const session_id = nanoid(50);
+		const account_id = snowflake().toString();
 
 		insertAccount.run({
-			$account_id,
-			$discord_id: me.user.id,
-			$username: me.user.username,
-			$discord_avatar_hash: me.user.avatar,
+			account_id,
+			discord_id: me.user.id,
+			username: me.user.username,
+			discord_avatar_hash: me.user.avatar,
 		});
 		insertSession.run({
-			$session_id,
-			$account_id,
+			session_id,
+			account_id,
 		});
 
 		return {
-			token: $session_id,
+			token: session_id,
 		};
 	}
 

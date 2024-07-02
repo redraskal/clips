@@ -39,9 +39,9 @@ export default class implements Route {
 		const id = snowflake().toString();
 
 		insertClip.run({
-			$id: id,
-			$title: parse(file.name).name,
-			$uploader_id: account.id,
+			id: id,
+			title: parse(file.name).name,
+			uploader_id: account.id,
 		});
 
 		const path = join(root, `${id}.mp4`);
@@ -56,8 +56,8 @@ export default class implements Route {
 		await generateThumbnail(path, duration / 2, join(root, `${id}.jpg`));
 
 		updateClipDuration.run({
-			$id: id,
-			$video_duration: duration,
+			id: id,
+			video_duration: duration,
 		});
 
 		return {

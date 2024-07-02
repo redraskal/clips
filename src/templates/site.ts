@@ -10,7 +10,7 @@ type SiteParams = {
 export function site(params: SiteParams) {
 	return html`
 		<nav>
-			<h2>Clips</h2>
+			<h3>Clips</h3>
 			<ul>
 				<li>
 					<a href="/">Home</a>

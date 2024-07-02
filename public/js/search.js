@@ -1,7 +1,7 @@
 const search = document.getElementById("search");
 
 document.addEventListener("keydown", (e) => {
-	if (e.keyCode == 191) {
+	if (e.key == "/") {
 		e.preventDefault();
 		search.focus();
 	}

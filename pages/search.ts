@@ -43,7 +43,7 @@ const selectSearchResults = db.query(
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
 		const data = await schema.parseAsync(route.query);
-		const results = selectSearchResults.all({ $query: data.q }) as ClipPreview[];
+		const results = selectSearchResults.all({ query: data.q }) as ClipPreview[];
 
 		return {
 			_account: inferAccount(req),

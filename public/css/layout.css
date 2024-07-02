@@ -4,11 +4,33 @@
 	--padding: 1rem;
 }
 
+html {
+	height: 100%;
+}
+
+body {
+	min-height: 100%;
+
+	background-color: #ffb699;
+	background-image: radial-gradient(at 23% 63%, hsla(262, 79%, 64%, 1) 0px, transparent 50%),
+		radial-gradient(at 16% 34%, hsla(341, 95%, 60%, 1) 0px, transparent 50%),
+		radial-gradient(at 44% 74%, hsla(302, 74%, 79%, 1) 0px, transparent 50%),
+		radial-gradient(at 66% 53%, hsla(260, 76%, 63%, 1) 0px, transparent 50%),
+		radial-gradient(at 52% 15%, hsla(357, 99%, 60%, 1) 0px, transparent 50%),
+		radial-gradient(at 95% 9%, hsla(220, 81%, 68%, 1) 0px, transparent 50%),
+		radial-gradient(at 85% 16%, hsla(209, 83%, 70%, 1) 0px, transparent 50%);
+}
+
 nav {
+	position: sticky;
+	top: 0;
 	display: flex;
-	background: var(--accents-1);
 	padding-left: var(--gap);
 	padding-right: var(--gap);
+
+	background: color(display-p3 1 1 1 / 0.3);
+	backdrop-filter: blur(15px);
+	box-shadow: 0 0 10px color(display-p3 0 0 0 / 0.2);
 
 	> ul {
 		width: 100%;
@@ -24,7 +46,7 @@ nav {
 
 			> a {
 				text-decoration: none;
-				font-size: large;
+				font-size: medium;
 				font-weight: 500;
 
 				&:hover {
@@ -133,7 +155,7 @@ p[placeholder]:empty {
 		flex-direction: row;
 		flex-wrap: wrap;
 
-		> h2 {
+		> h3 {
 			display: none;
 		}
 
@@ -150,11 +172,15 @@ p[placeholder]:empty {
 			justify-content: center;
 			margin-left: 0;
 		}
+
+		> ul:last-child {
+			display: none;
+		}
 	}
 
 	nav,
 	main {
-		padding: 0;
+		padding: 0 0 4px 0;
 	}
 
 	ul.clips {

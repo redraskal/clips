@@ -56,9 +56,9 @@ export default class implements Route {
 				const body = await editSchema.parseAsync(await req.json());
 
 				editClip.run({
-					$id: route.params.id,
-					$title: body.title || data.title,
-					$description: body.description || data.description,
+					id: route.params.id,
+					title: body.title || data.title,
+					description: body.description || data.description,
 				});
 
 				return { _edited: true };
@@ -88,7 +88,7 @@ export default class implements Route {
 
 		return (
 			meta({
-				title: data.title + " | Clips",
+				title: data.title,
 				description: data.description,
 			}) +
 			style +
