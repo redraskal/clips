@@ -114,17 +114,21 @@ ul.clips {
 		}
 	}
 
-	> li > video {
+	> li > div > video {
 		background: var(--background);
 		cursor: pointer;
 		border-radius: var(--border-radius);
 		margin-bottom: 0.3rem;
+		box-shadow: 0 0 30px color(display-p3 0 0 0 / 0.5);
 	}
 }
 
 video[controls] {
 	max-height: 80vh;
 	margin: auto;
+	border-bottom-left-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
+	box-shadow: 0 0 30px color(display-p3 0 0 0 / 0.5);
 }
 
 main {
