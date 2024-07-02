@@ -1,18 +1,18 @@
 import { type Data, Route, cache, html, meta } from "gateway";
-import { ensureSignedIn, inferAccount } from "../src/middleware/auth";
+import { ensureSignedIn, inferAccount } from "../../src/middleware/auth";
 import { mkdir } from "fs/promises";
 import { join, parse } from "path";
-import { db } from "../src/database";
+import { db } from "../../src/database";
 import { File } from "buffer";
-import { convertToMP4Container, generateThumbnail, videoDuration } from "../src/ffmpeg";
-import { site } from "../src/templates/site";
-import { style } from "../src/templates/style";
-import { snowflake } from "../src/snowflake";
-import { storagePath } from "../src/utils";
+import { convertToMP4Container, generateThumbnail, videoDuration } from "../../src/ffmpeg";
+import { site } from "../../src/templates/site";
+import { style } from "../../src/templates/style";
+import { snowflake } from "../../src/snowflake";
+import { storagePath } from "../../src/utils";
 
 const insertClip = db.query(`
-	insert into clips (id, title, uploader_id, video_duration)
-	values ($id, $title, $uploader_id, -1)
+	insert into clips (id, title, uploader_id, video_duration, hash)
+	values ($id, $title, $uploader_id, -1, $hash)
 `);
 const updateClipDuration = db.query("update clips set video_duration=$video_duration where id=$id");
 
@@ -37,11 +37,13 @@ export default class implements Route {
 		await mkdir(root, { recursive: true });
 
 		const id = snowflake().toString();
+		const hash = Bun.hash(await file.arrayBuffer());
 
 		insertClip.run({
 			id: id,
 			title: parse(file.name).name,
 			uploader_id: account.id,
+			hash,
 		});
 
 		const path = join(root, `${id}.mp4`);
