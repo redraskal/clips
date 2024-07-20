@@ -67,11 +67,6 @@ export default class implements Route {
 			body: html`
 				<h2>Search results for "${data.query}"</h2>
 				${data.results.length > 0 ? clipPreviews(data.results) : html`<p>No results found.</p>`}
-				<script>
-					function watch(id) {
-						window.location.href = "/watch/" + id;
-					}
-				</script>
 			`,
 		});
 	}

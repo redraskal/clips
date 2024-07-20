@@ -17,7 +17,7 @@ export function clipPreviews(clips: ClipPreview[]) {
 			${clips.map(
 				(clip) => html`
 					<li>
-						<div onclick="watch('${clip.id}')">
+						<a href="/watch/${clip.id}">
 							<video
 								src="/content/${clip.uploader_id}/${clip.id}.mp4"
 								poster="/content/${clip.uploader_id}/${clip.id}.jpg"
@@ -30,7 +30,7 @@ export function clipPreviews(clips: ClipPreview[]) {
 							<span>${formatDuration(clip.video_duration)}</span>
 							<span>${formatViews(clip.views)}</span>
 							<span>${dateTimeFormat.format(snowflakeToDate(BigInt(clip.id)))}</span>
-						</div>
+						</a>
 						<b>${clip.title}</b>
 						<p><a href="/@${clip.username}">${clip.username}</a></p>
 					</li>

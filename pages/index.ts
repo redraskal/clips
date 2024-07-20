@@ -64,11 +64,6 @@ export default class implements Route {
 							${clipPreviews(data.fromFriends)}
 						`
 					: ""}
-				<script>
-					function watch(id) {
-						window.location.href = "/watch/" + id;
-					}
-				</script>
 			`,
 		});
 	}

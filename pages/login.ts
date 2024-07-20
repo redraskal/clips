@@ -15,6 +15,14 @@ const insertAccount = db.query(`
 	values ($account_id, $discord_id, $username, $discord_avatar_hash)
 	on conflict(discord_id) do update set discord_avatar_hash=$discord_avatar_hash
 `);
+const selectAccountId = db.query<
+	{
+		id: string;
+	},
+	{
+		discord_id: string;
+	}
+>("select id from accounts where discord_id=:discord_id");
 const insertSession = db.query("insert into sessions (id, account_id) values ($session_id, $account_id)");
 
 @cache("head")
@@ -55,17 +63,25 @@ export default class implements Route {
 		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
 
 		const session_id = nanoid(50);
-		const account_id = snowflake().toString();
 
 		insertAccount.run({
-			account_id,
+			account_id: snowflake().toString(),
 			discord_id: me.user.id,
 			username: me.user.username,
 			discord_avatar_hash: me.user.avatar,
 		});
+
+		const account = selectAccountId.get({
+			discord_id: me.user.id,
+		});
+
+		if (!account) {
+			throw new Error("Error while creating account.");
+		}
+
 		insertSession.run({
 			session_id,
-			account_id,
+			account_id: account.id,
 		});
 
 		return {
@@ -88,7 +104,7 @@ export default class implements Route {
 
 			response.headers.set(
 				"Set-Cookie",
-				`clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite: none; Secure; HttpOnly`
+				`clips=${encodeURIComponent(data.token)}; Expires=${expiresAt}; SameSite=Strict; Secure; HttpOnly`
 			);
 
 			return response;

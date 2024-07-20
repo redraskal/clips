@@ -86,7 +86,8 @@ ul.clips {
 		margin: 0;
 	}
 
-	> li > div {
+	> li > a {
+		display: block;
 		position: relative;
 		width: 400px;
 		cursor: pointer;
@@ -114,7 +115,7 @@ ul.clips {
 		}
 	}
 
-	> li > div > video {
+	> li > a > video {
 		background: var(--background);
 		cursor: pointer;
 		border-radius: var(--border-radius);
