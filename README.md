@@ -2,7 +2,9 @@
 
 Self-hosted video game clips website using Bun, bun:sqlite, & FFmpeg.
 
-**Work-in-progress**
+**Work-in-progress, especially the UI design**
+
+![screenshot of a clips deployment](example.jpg)
 
 ## Production Quick start:
 
