@@ -19,7 +19,19 @@ const editSchema = z
 	.partial()
 	.refine((data) => !!data.title || !!data.description, "title or description must be present.");
 
-export const selectClip = db.query(`
+export const selectClip = db.query<
+	{
+		id: string;
+		title: string;
+		description: string | null;
+		uploader_id: string;
+		video_duration: number;
+		views: number;
+		username: string | null;
+		discord_id: string | null;
+	} | null,
+	string
+>(`
 	select clips.id, clips.title, clips.description, clips.uploader_id, clips.video_duration, clips.views, accounts.discord_id, accounts.username
 	from clips
 	left join accounts on clips.uploader_id=accounts.id
@@ -31,16 +43,7 @@ const deleteClipByID = db.query("delete from clips where id=?");
 
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
-		const data = selectClip.get(route.params.id) as {
-			id: string;
-			title: string;
-			description: string | null;
-			uploader_id: string;
-			video_duration: number;
-			views: number;
-			username: string | null;
-			discord_id: string | null;
-		} | null;
+		const data = selectClip.get(route.params.id);
 
 		if (!data || !data.discord_id) throw new Error("Clip not found.");
 
@@ -78,8 +81,8 @@ export default class implements Route {
 		return {
 			_root: `/content/${data.uploader_id}/${data.id}`,
 			_account: account,
-			...data,
 			editable,
+			...data,
 		};
 	}
 

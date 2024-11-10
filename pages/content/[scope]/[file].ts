@@ -19,7 +19,7 @@ export default class implements Route {
 
 		return {
 			_start: Math.max(0, _start),
-			_end: Math.min(file.size - 1, Math.max(_start + 3e7, _end)), // at least a 30MB chunk
+			_end: Math.min(file.size - 1, Math.max(_start + 3e7, _end)), // ensure at least a 30MB chunk
 			_path: path,
 			_file: file,
 		};

@@ -8,13 +8,31 @@ import { dateTimeFormat } from "../src/utils";
 import { snowflakeToDate } from "../src/snowflake";
 import { style } from "../src/templates/style";
 
-const selectAccount = db.query(`
+const selectAccount = db.query<
+	{
+		id: string;
+		username: string;
+		discord_id: string;
+		discord_avatar_hash?: string;
+	} | null,
+	string
+>(`
 	select id, username, discord_id, discord_avatar_hash
 	from accounts
 	where username=?
 `);
 
-const selectClips = db.query(`
+const selectClips = db.query<
+	{
+		id: string;
+		uploader_id: string;
+		title: string;
+		username: string | null;
+		video_duration: number;
+		views: number;
+	},
+	string
+>(`
 	select clips.id, clips.uploader_id, clips.title, accounts.username, clips.video_duration, clips.views
 	from clips
 	left join accounts on clips.uploader_id=accounts.id
@@ -26,23 +44,11 @@ export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {
 		if (!route.params.slug.startsWith("@")) return;
 
-		const account = selectAccount.get(route.params.slug.slice(1)) as {
-			id: string;
-			username: string;
-			discord_id: string;
-			discord_avatar_hash?: string;
-		};
+		const account = selectAccount.get(route.params.slug.slice(1));
 
 		if (!account) throw new Error("Account not found");
 
-		const clips = selectClips.all(account.id) as {
-			id: string;
-			uploader_id: string;
-			title: string;
-			username: string | null;
-			video_duration: number;
-			views: number;
-		}[];
+		const clips = selectClips.all(account.id);
 
 		return {
 			_account: inferAccount(req),

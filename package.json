@@ -2,7 +2,7 @@
 	"name": "clips",
 	"devDependencies": {
 		"@types/bun": "latest",
-		"prettier": "^3.3.2"
+		"prettier": "^3.3.3"
 	},
 	"peerDependencies": {
 		"typescript": "^5.4.5"
@@ -16,8 +16,8 @@
 	"dependencies": {
 		"bun-kv": "redraskal/bun-kv#9963186",
 		"bun-migrate": "redraskal/bun-migrate#4a43cac",
-		"gateway": "redraskal/gateway#a81da5e",
-		"nanoid": "^5.0.7",
+		"gateway": "redraskal/gateway#135b709",
+		"nanoid": "^5.0.8",
 		"zod": "^3.23.8"
 	}
 }

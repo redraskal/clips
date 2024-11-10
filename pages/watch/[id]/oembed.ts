@@ -4,16 +4,7 @@ import { selectClip } from ".";
 
 export default class implements Route {
 	async data(_: Request, route: MatchedRoute) {
-		const data = selectClip.get(route.params.id) as {
-			id: string;
-			title: string;
-			description: string | null;
-			uploader_id: string;
-			video_duration: number;
-			views: number;
-			username: string | null;
-			discord_id: string | null;
-		} | null;
+		const data = selectClip.get(route.params.id);
 
 		if (!data || !data.discord_id) throw new Error("Clip not found.");
 

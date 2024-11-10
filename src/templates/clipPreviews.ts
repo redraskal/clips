@@ -1,5 +1,5 @@
 import { html } from "gateway";
-import { dateTimeFormat, formatDuration, formatViews } from "../utils";
+import { dateTimeFormat, formatDuration, pluralize } from "../utils";
 import { snowflakeToDate } from "../snowflake";
 
 export type ClipPreview = {
@@ -14,28 +14,33 @@ export type ClipPreview = {
 export function clipPreviews(clips: ClipPreview[]) {
 	return html`
 		<ul class="clips">
-			${clips.map(
-				(clip) => html`
+			${clips.map(({ id, title, uploader_id, video_duration, views, username }) => {
+				const durationAsString = formatDuration(video_duration);
+				const viewsAsString = pluralize(views, "view");
+				const uploadedAt = dateTimeFormat.format(snowflakeToDate(BigInt(id)));
+				const contentRoot = `/content/${uploader_id}/${id}`;
+
+				return html`
 					<li>
-						<a href="/watch/${clip.id}">
+						<a href="/watch/${id}">
 							<video
-								src="/content/${clip.uploader_id}/${clip.id}.mp4"
-								poster="/content/${clip.uploader_id}/${clip.id}.jpg"
+								src="${contentRoot}.mp4"
+								poster="${contentRoot}.jpg"
 								muted
 								loop
 								preload="none"
 								onmouseover="this.play()"
 								onmouseout="this.pause()"
 							></video>
-							<span>${formatDuration(clip.video_duration)}</span>
-							<span>${formatViews(clip.views)}</span>
-							<span>${dateTimeFormat.format(snowflakeToDate(BigInt(clip.id)))}</span>
+							<span>${durationAsString}</span>
+							<span>${viewsAsString}</span>
+							<span>${uploadedAt}</span>
 						</a>
-						<b>${clip.title}</b>
-						<p><a href="/@${clip.username}">${clip.username}</a></p>
+						<b>${title}</b>
+						<p><a href="/@${username}">${username}</a></p>
 					</li>
-				`
-			)}
+				`;
+			})}
 		</ul>
 	`;
 }

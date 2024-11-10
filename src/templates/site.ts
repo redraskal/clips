@@ -7,6 +7,11 @@ type SiteParams = {
 	account?: CachedAccount;
 };
 
+/**
+ * Builds an HTML body template for a given site path and account.
+ * @param params SiteParams
+ * @returns html
+ */
 export function site(params: SiteParams) {
 	return html`
 		<nav>

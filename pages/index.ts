@@ -5,7 +5,7 @@ import { site } from "../src/templates/site";
 import { clipPreviews, type ClipPreview } from "../src/templates/clipPreviews";
 import { style } from "../src/templates/style";
 
-const selectRecentlyUploadedClips = db.query(`
+const selectRecentlyUploadedClips = db.query<ClipPreview, string>(`
 	select clips.id, clips.uploader_id, clips.title, clips.video_duration, clips.views, accounts.username
 	from clips
 	left join accounts on clips.uploader_id=accounts.id
@@ -14,7 +14,7 @@ const selectRecentlyUploadedClips = db.query(`
 	limit 8
 `);
 
-const selectClipsFromFriends = db.query(`
+const selectClipsFromFriends = db.query<ClipPreview, string>(`
 	select clips.id, clips.uploader_id, clips.title, clips.video_duration, clips.views, accounts.username
 	from clips
 	left join accounts on clips.uploader_id=accounts.id
@@ -28,8 +28,8 @@ export default class implements Route {
 	async data(req: Request) {
 		const account = inferAccount(req);
 
-		const recentlyUploaded = account ? (selectRecentlyUploadedClips.all(account.id) as ClipPreview[]) : [];
-		const fromFriends = selectClipsFromFriends.all(account?.id || 0) as ClipPreview[];
+		const recentlyUploaded = account ? selectRecentlyUploadedClips.all(account.id) : [];
+		const fromFriends = selectClipsFromFriends.all(account?.id || "0");
 
 		return {
 			_account: account,
