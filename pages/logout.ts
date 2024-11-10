@@ -2,7 +2,7 @@ import { Route } from "gateway";
 import { ensureSignedIn, sessionToken } from "../src/middleware/auth";
 import { db } from "../src/database";
 
-const deleteSessionByID = db.query("delete from sessions where id=?");
+const deleteSessionByID = db.query<undefined, string>("delete from sessions where id=?");
 
 export default class implements Route {
 	@ensureSignedIn()

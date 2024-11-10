@@ -1,7 +1,7 @@
 import Database from "bun:sqlite";
 
 const db = new Database(process.env.DATABASE || "clips.sqlite", {
-	safeInteger: true,
+	safeIntegers: true,
 	strict: true,
 });
 
