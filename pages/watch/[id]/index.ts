@@ -37,9 +37,16 @@ export const selectClip = db.query<
 	left join accounts on clips.uploader_id=accounts.id
 	where clips.id=?
 `);
-const incrementViews = db.query("update clips set views=views+1 where id=?");
-const editClip = db.query(`update clips set title=$title, description=$description where id=$id`);
-const deleteClipByID = db.query("delete from clips where id=?");
+const incrementViews = db.query<undefined, string>("update clips set views=views+1 where id=?");
+const editClip = db.query<
+	undefined,
+	{
+		id: string;
+		title?: string | null;
+		description?: string | null;
+	}
+>(`update clips set title=$title, description=$description where id=$id`);
+const deleteClipByID = db.query<undefined, string>("delete from clips where id=?");
 
 export default class implements Route {
 	async data(req: Request, route: MatchedRoute) {

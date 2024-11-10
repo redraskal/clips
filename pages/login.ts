@@ -7,8 +7,7 @@ import { style } from "../src/templates/style";
 import { snowflake } from "../src/snowflake";
 import { nanoid } from "nanoid";
 import { whitelist } from "../src/utils";
-
-const authorization = `Basic ${btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`)}`;
+import { fetchDiscordUser } from "../src/discord";
 
 const insertAccount = db.query(`
 	insert into accounts (id, discord_id, username, discord_avatar_hash) 
@@ -34,45 +33,25 @@ export default class implements Route {
 		const code = route.query.code;
 		if (!code) return;
 
-		const token = await fetch("https://discord.com/api/oauth2/token", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Authorization: authorization,
-			},
-			body: new URLSearchParams({
-				grant_type: "authorization_code",
-				code,
-				redirect_uri: process.env.DISCORD_REDIRECT_URI,
-			}),
-		}).then((res) => res.json() as { access_token?: string });
+		const user = await fetchDiscordUser(code);
 
-		if (!token.access_token) {
+		if (!user) {
 			throw new Error("Could not authenticate Discord account.");
 		}
 
-		const me = await fetch("https://discord.com/api/oauth2/@me", {
-			headers: {
-				Authorization: `Bearer ${token.access_token}`,
-			},
-		}).then((res) => res.json() as { user?: any });
-
-		if (!me.user) {
-			throw new Error("Could not authenticate Discord account.");
-		}
-		if (!whitelist.includes(me.user.id)) throw new Error("Account not whitelisted.");
+		if (!whitelist.includes(user.id)) throw new Error("Account not whitelisted.");
 
 		const session_id = nanoid(50);
 
 		insertAccount.run({
 			account_id: snowflake().toString(),
-			discord_id: me.user.id,
-			username: me.user.username,
-			discord_avatar_hash: me.user.avatar,
+			discord_id: user.id,
+			username: user.username,
+			discord_avatar_hash: user.avatar,
 		});
 
 		const account = selectAccountId.get({
-			discord_id: me.user.id,
+			discord_id: user.id,
 		});
 
 		if (!account) {
